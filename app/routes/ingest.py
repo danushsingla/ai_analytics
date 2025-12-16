@@ -1,7 +1,9 @@
 import os
 from fastapi import FastAPI, APIRouter
+from fastapi.responses import Response
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load .env.local by looking for the file one directory above
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
@@ -21,3 +23,19 @@ async def collect_event(event: dict):
     # Create a table in supabase called "events" and insert the event data
     response = supabase.table("events").insert(event).execute()
     return {"status": "ok", "data": response.data}
+
+# Set the path of the tracker.js file which holds my HTML code
+TRACKER_PATH = Path(__file__).parent / "tracker.js"
+
+# Sends the GTM tag so it can easily be managed locally
+@router.get("/gtmtracker.js")
+async def gtmtracker():
+    with open(TRACKER_PATH, "r", encoding="utf-8") as f:
+        tracker_js = f.read()
+    return Response(
+        content=tracker_js,
+        media_type="application/javascript",
+        headers={
+            "Cache-Control": "no-store, max-age=0"
+        }
+    )
