@@ -18,4 +18,3 @@ This is what is in the actual GTM which reads from the /gtmtracker endpoint
   document.head.appendChild(s);
 })();
 </script>
-````js
