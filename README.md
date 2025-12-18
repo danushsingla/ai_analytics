@@ -41,7 +41,8 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Reduce and organize the requests when they come into supabase (currently they just spam a bunch of requests - find out why)
+Expand test app - create Clerk sign in features, add more api requests in some form (i.e. talk to a database), and add more page routings to feel like a real app
+Perform extensive testing to distinguish AI chat with other API requests (to filter out anything we don't need)
 
 ## Huge Security Violation
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forgoe this due to the ease of development.

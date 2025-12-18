@@ -3,6 +3,7 @@
   // Grab the fetch to the backend
   var originalFetch = window.fetch;
 
+  // This will be able to grab any fetch request made by the app
   window.fetch = function () {
     var url = arguments[0];
     var options = arguments[1] || {};
