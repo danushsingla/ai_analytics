@@ -18,3 +18,10 @@ This is what is in the actual GTM which reads from the /gtmtracker endpoint
   document.head.appendChild(s);
 })();
 </script>
+
+
+# To Do
+Reduce and organize the requests when they come into supabase (currently they just spam a bunch of requests - find out why)
+
+## Huge Security Violation
+Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forgoe this due to the ease of development.
