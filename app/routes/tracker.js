@@ -1,4 +1,4 @@
-<script>
+
 (function () {
   // Grab the fetch to the backend
   var originalFetch = window.fetch;
@@ -23,7 +23,7 @@
         new Blob(
           [JSON.stringify({
             project_id: "aianalyticstest",
-            event_type: "request",
+            event_type: "user_input",
             payload: {
               url: url,
               method: method,
@@ -60,7 +60,7 @@
             new Blob(
               [JSON.stringify({
                 project_id: "aianalyticstest",
-                event_type: "request",
+                event_type: "ai_response",
                 payload: {
                   url: url,
                   status: response.status,
@@ -82,7 +82,7 @@
             new Blob(
               [JSON.stringify({
                 project_id: "aianalyticstest",
-                event_type: "request",
+                event_type: "ai_response",
                 payload: {
                   url: url,
                   status: response.status,
@@ -100,4 +100,3 @@
     });
   };
 })();    
-</script>

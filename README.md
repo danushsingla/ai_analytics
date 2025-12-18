@@ -19,6 +19,8 @@ This is what is in the actual GTM which reads from the /gtmtracker endpoint
 })();
 </script>
 
+Something to note for the tracker script: If you want to run the script directly into GTM you must add `<script></script>` at the beginning and end of the GTM tracker script. Right now, that isn't there.
+
 
 # To Do
 Reduce and organize the requests when they come into supabase (currently they just spam a bunch of requests - find out why)
