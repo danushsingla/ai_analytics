@@ -35,7 +35,7 @@ This is what is in the actual GTM which reads from the /gtmtracker endpoint
   document.head.appendChild(s);
 })();
 </script>
-````js
+```
 
 Something to note for the tracker script: If you want to run the script directly into GTM you must add `<script></script>` at the beginning and end of the GTM tracker script. Right now, that isn't there.
 
