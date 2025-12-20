@@ -18,11 +18,10 @@
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
+    // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
     var options = arguments[1] || {};
     var method = options.method ? options.method : "GET";
-
-    console.log(url, method, options);
 
     // Add a request ID to track requests/responses together
     var requestId = makeRequestId();
