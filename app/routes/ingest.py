@@ -44,7 +44,7 @@ async def gtmtracker():
 @router.get("/config")
 async def get_config(project_id: str):
     response = supabase.table("project_allowlist").select("api_urls").eq("project_id", project_id).execute()
-    print(response.data)
+    print(response.data[0]["api_urls"]["urls"])
     if response.data and "urls" in response.data[0]["api_urls"]:
         return {"valid_urls": response.data[0]["api_urls"]["urls"]}
     else:

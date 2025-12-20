@@ -29,6 +29,8 @@
       validUrls = [];
     });
 
+  console.log("Data fetched:", data);
+
   // Grab the fetch to the backend
   var originalFetch = window.fetch;
 
