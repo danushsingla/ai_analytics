@@ -23,13 +23,12 @@
       if (data && data.valid_urls) {
         validUrls = data.valid_urls;
       }
+      console.log("Data fetched:", data);
     })
     .catch(function (e) {
       // In case of error, just keep going with empty validUrls
       validUrls = [];
     });
-
-  console.log("Data fetched:", data);
 
   // Grab the fetch to the backend
   var originalFetch = window.fetch;
