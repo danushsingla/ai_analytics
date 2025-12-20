@@ -39,3 +39,9 @@ async def gtmtracker():
             "Cache-Control": "no-store, max-age=0"
         }
     )
+
+# Access Supabase to return a list of api urls the client chose
+@router.get("/config")
+async def get_config():
+    response = supabase.table("config").select("*").execute()
+    return {"status": "ok", "data": response.data}

@@ -11,7 +11,7 @@ app.include_router(ingest_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],    # temporarily adding localhost, will need to figure out a list of allowed origins later
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],
 )

@@ -18,6 +18,9 @@
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
+    // grab the project_id from the url
+    
+
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
     var options = arguments[1] || {};
