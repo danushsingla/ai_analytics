@@ -8,6 +8,9 @@
     var url = arguments[0];
     var options = arguments[1] || {};
     var method = options.method ? options.method : "GET";
+
+    // Add a request ID to track requests/responses together
+    var requestId = crypto.randomUUID();
     
     // Get request body if there is one
     var requestBody = null;
@@ -25,6 +28,7 @@
           [JSON.stringify({
             project_id: "aianalyticstest",
             event_type: "user_input",
+            request_id: requestId,
             payload: {
               url: url,
               method: method,
@@ -62,6 +66,7 @@
               [JSON.stringify({
                 project_id: "aianalyticstest",
                 event_type: "ai_response",
+                request_id: requestId,
                 payload: {
                   url: url,
                   status: response.status,
@@ -84,6 +89,7 @@
               [JSON.stringify({
                 project_id: "aianalyticstest",
                 event_type: "ai_response",
+                request_id: requestId,
                 payload: {
                   url: url,
                   status: response.status,
