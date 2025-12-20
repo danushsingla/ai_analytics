@@ -19,11 +19,11 @@
 
   // Call endpoint /config to get valid urls for this project
   fetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
-    .then(function (data) {
-      if (data && data.valid_urls) {
-        validUrls = data.valid_urls;
+    .then(function (response) {
+      if (response && response.valid_urls) {
+        validUrls = response.valid_urls;
       }
-      console.log("Data fetched:", data);
+      console.log("Response:", response);
     })
     .catch(function (e) {
       // In case of error, just keep going with empty validUrls
