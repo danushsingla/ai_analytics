@@ -42,6 +42,9 @@ async def gtmtracker():
 
 # Access Supabase to return a list of api urls the client chose
 @router.get("/config")
-async def get_config():
-    response = supabase.table("config").select("*").execute()
-    return {"status": "ok", "data": response.data}
+async def get_config(project_id: str):
+    response = supabase.table("project_allowlist").select("urls").eq("project_id", project_id).execute()
+    if response.data:
+        return {"api_urls": response.data[0]["api_urls"]}
+    else:
+        return {"api_urls": []}

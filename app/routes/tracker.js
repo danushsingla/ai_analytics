@@ -18,13 +18,24 @@
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
-    /* Get valid api call urls from Supabase */
-    // grab the project_id from the url
-    // var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
-    var PROJECT_ID = "aianalyticstest"; // Placeholder until we can grab from url
+    // grab the project_id from the url (not entirely needed)
+    var validUrls = [];
+    var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
 
-    // Call Supabase for this project's valid api call urls
-    var validUrls = ["/api/chat", "/api/otherendpoint"]; // Placeholder - in reality, we would fetch this from Supabase
+    // Call endpoint /config to get valid urls for this project
+    fetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
+      .then(function (data) {
+        if (data && data.valid_urls) {
+          validUrls = data.valid_urls;
+        }
+      })
+      .catch(function (e) {
+        // In case of error, just keep going with empty validUrls
+        validUrls = [];
+      });
+
+      console.log("Valid URLs for tracking:", validUrls);
+      console.log("Project ID:", PROJECT_ID);
 
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
