@@ -20,6 +20,7 @@
   window.fetch = function () {
     // grab the project_id from the url (not entirely needed)
     var validUrls = [];
+    console.log(document.currentScript.src);
     var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
 
     // Call endpoint /config to get valid urls for this project
