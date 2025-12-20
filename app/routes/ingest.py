@@ -45,7 +45,7 @@ async def gtmtracker():
 async def get_config(project_id: str):
     response = supabase.table("project_allowlist").select("api_urls").eq("project_id", project_id).execute()
     print(response.data)
-    if response.data and "urls" in response.data["api_urls"]:
-        return {"valid_urls": response.data["api_urls"]["urls"]}
+    if response.data and "urls" in response.data[0]["api_urls"]:
+        return {"valid_urls": response.data[0]["api_urls"]["urls"]}
     else:
         return {"valid_urls": []}
