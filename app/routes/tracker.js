@@ -10,18 +10,17 @@
         return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
           (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
         );
-    }
+      }
 
+  // grab the project_id from the url (not entirely needed)
+  var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
 
   // Grab the fetch to the backend
   var originalFetch = window.fetch;
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
-    // grab the project_id from the url (not entirely needed)
     var validUrls = [];
-    console.log(document.currentScript.src);
-    var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
 
     // Call endpoint /config to get valid urls for this project
     fetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
