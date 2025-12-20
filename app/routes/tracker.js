@@ -18,11 +18,23 @@
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
+    /* Get valid api call urls from Supabase */
     // grab the project_id from the url
-    
+    // var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
+    var PROJECT_ID = "aianalyticstest"; // Placeholder until we can grab from url
+
+    // Call Supabase for this project's valid api call urls
+    var validUrls = ["/api/chat", "/api/otherendpoint"]; // Placeholder - in reality, we would fetch this from Supabase
 
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
+
+    // Before doing anything else, check if this url is in the list of valid urls
+    if (!validUrls.includes(url)) {
+      // If not, just call the original fetch and return
+      return originalFetch.apply(window, arguments);
+    }
+
     var options = arguments[1] || {};
     var method = options.method ? options.method : "GET";
 
