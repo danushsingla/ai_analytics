@@ -1,16 +1,16 @@
 
 (
   function () {
-    // Creates a requestId in case there is no crypto.randomUUID available
-    function makeRequestId() {
-      if (window.crypto && crypto.randomUUID) {
-        return crypto.randomUUID();
-      }
+  // Creates a requestId in case there is no crypto.randomUUID available
+  function makeRequestId() {
+    if (window.crypto && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
 
-        return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
-          (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
-        );
-      }
+      return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+      );
+    }
 
   // grab the project_id from the url (not entirely needed)
   var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
