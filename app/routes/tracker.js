@@ -30,11 +30,10 @@
       if(!response.ok) {
         throw new Error("Network response was not ok");
       }
-    })
-    .then(function (data) {
-      console.log(data);
-      if(data && Array.isArray(data.valid_urls)) {
-        validUrls = data.valid_urls;
+
+      console.log("Response is ", response);
+      if(response && Array.isArray(response.valid_urls)) {
+        validUrls = response.valid_urls;
       } else {
         validUrls = [];
       }
