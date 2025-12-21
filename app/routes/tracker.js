@@ -31,7 +31,7 @@
         throw new Error("Network response was not ok");
       }
 
-      console.log("Response is ", response);
+      console.log("Response is ", response.body);
       if(response && Array.isArray(response.valid_urls)) {
         validUrls = response.valid_urls;
       } else {
