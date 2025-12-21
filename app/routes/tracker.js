@@ -34,7 +34,6 @@
       return response.json();
     })
     .then(function (data) {
-      console.log(data);
       if(data && Array.isArray(data.valid_urls)) {
         validUrls = data.valid_urls;
       } else {
@@ -49,16 +48,11 @@
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
-      console.log("Valid URLs for tracking:", validUrls);
-      console.log("Project ID:", PROJECT_ID);
-
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
 
     // Before doing anything else, check if this url is in the list of valid urls
     if (!validUrls.includes(url)) {
-      console.log("URL not in valid URLs list, skipping tracking for:", url);
-      console.log("Valid URLs are:", validUrls);
       // If not, just call the original fetch and return
       return originalFetch.apply(window, arguments);
     }
