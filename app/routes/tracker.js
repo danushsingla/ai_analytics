@@ -1,6 +1,10 @@
 
 (
   function () {
+    // Prevents loading the script multiple times
+  if (window.__AI_ANALYTICS_LOADED__) return;
+    window.__AI_ANALYTICS_LOADED__ = true;
+
   // Creates a requestId in case there is no crypto.randomUUID available
   function makeRequestId() {
     if (window.crypto && crypto.randomUUID) {
@@ -50,6 +54,8 @@
 
     // Before doing anything else, check if this url is in the list of valid urls
     if (!validUrls.includes(url)) {
+      console.log("URL not in valid URLs list, skipping tracking for:", url);
+      console.log("Valid URLs are:", validUrls);
       // If not, just call the original fetch and return
       return originalFetch.apply(window, arguments);
     }
