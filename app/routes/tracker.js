@@ -34,6 +34,7 @@
       return response.json();
     })
     .then(function (data) {
+      console.log(data);
       if(data && Array.isArray(data.valid_urls)) {
         validUrls = data.valid_urls;
       } else {
