@@ -12,6 +12,9 @@
       );
     }
 
+    // Grab the fetch to the backend
+    var originalFetch = window.fetch;
+
   // grab the project_id from the url (not entirely needed)
   var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
 
@@ -36,9 +39,6 @@
       // In case of error, just keep going with empty validUrls
       validUrls = [];
     });
-
-  // Grab the fetch to the backend
-  var originalFetch = window.fetch;
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
