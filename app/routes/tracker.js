@@ -21,7 +21,7 @@
   var validUrls = [];
 
   // Call endpoint /config to get valid urls for this project
-  fetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
+  originalFetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
     .then(function (response) {
       if(!response.ok) {
         throw new Error("Network response was not ok");
