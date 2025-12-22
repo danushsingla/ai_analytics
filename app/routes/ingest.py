@@ -1,9 +1,10 @@
 import os
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.responses import Response
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
+from pydantic import BaseModel, EmailStr
 
 # Load .env.local by looking for the file twp directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -55,3 +56,18 @@ async def get_config(project_id: str):
         return {"valid_urls": response.data[0]["api_urls"]["urls"]}
     else:
         return {"valid_urls": []}
+    
+class RegisterUserRequest(BaseModel):
+    email: EmailStr
+
+# When user signs into frontend, add them to the users table in Supabase and generate a unique id if they don't exist
+@router.post("/register_user")
+async def register_user(body: RegisterUserRequest):
+    email = body.email
+    # Check if user already exists
+    response = supabase.table("users").select("*").eq("email", email).execute()
+    if response.data:
+        return {"status": "exists", "user_id": response.data[0]["id"]}
+    
+    # If user does not exist, create a new entry
+    insert_response = supabase.table("users").insert({"email": email}).execute()

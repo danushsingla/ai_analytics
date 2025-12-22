@@ -15,7 +15,7 @@ app.include_router(ingest_router)
 # Set up CORS middleware to allow requests from any origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("FRONTEND_URL"), "https://aianalyticstestapp.vercel.app"],    # temporarily adding localhost, will need to figure out a list of allowed origins later
+    allow_origins=["http://localhost:3000", os.getenv("NEXT_PUBLIC_FRONTEND_URL"), "https://aianalyticstestapp.vercel.app"],    # temporarily adding localhost, will need to figure out a list of allowed origins later
     allow_credentials=True,
     allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],
