@@ -41,10 +41,12 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Expand test app - create Clerk sign in features, add more api requests in some form (i.e. talk to a database), and add more page routings to feel like a real app
-Perform extensive testing to distinguish AI chat with other API requests (to filter out anything we don't need)
-Due to CORS issues where client apps using tools like Clerk utilize cookies, those cookies get sent to our server unintentionally which causes lots of issues with the browser. To keep security prime, we must keep track of a list of client apps and add them to that list for allow_origins
+Expand test app - add talking to a database
+Move all links in code to ENV keys
+Publish test app as vercel site for proper testing (ensure Clerk is in production mode)
+Track client site list links - Due to CORS issues where client apps using tools like Clerk utilize cookies, those cookies get sent to our server unintentionally which causes lots of issues with the browser. To keep security prime, we must keep track of a list of client apps and add them to that list for allow_origins
 Create a decent-ish frontend with the ability to choose api urls and allowlist urls
 
-## Huge Security Violation
+## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forgoe this due to the ease of development.
+RLS is disabled for all tables in Supabase, this needs to be addressed at a later time
