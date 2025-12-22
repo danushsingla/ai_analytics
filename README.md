@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Move all links in code to ENV keys
 Publish test app as vercel site for proper testing (ensure Clerk is in production mode)
 Track client site list links - Due to CORS issues where client apps using tools like Clerk utilize cookies, those cookies get sent to our server unintentionally which causes lots of issues with the browser. To keep security prime, we must keep track of a list of client apps and add them to that list for allow_origins
 Create a decent-ish frontend with the ability to choose api urls and allowlist urls
