@@ -5,8 +5,8 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load .env.local by looking for the file one directory above
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
+# Load .env.local by looking for the file twp directories above
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
 supabase_url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_SERVICE_KEY")
 

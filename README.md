@@ -49,3 +49,4 @@ Create a decent-ish frontend with the ability to choose api urls and allowlist u
 ## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forgoe this due to the ease of development.
 RLS is disabled for all tables in Supabase, this needs to be addressed at a later time
+Remove localhost from allowed origins for CORS
