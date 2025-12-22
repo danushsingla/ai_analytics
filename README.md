@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Publish test app as vercel site for proper testing (ensure Clerk is in production mode)
 Track client site list links - Due to CORS issues where client apps using tools like Clerk utilize cookies, those cookies get sent to our server unintentionally which causes lots of issues with the browser. To keep security prime, we must keep track of a list of client apps and add them to that list for allow_origins
 Create a decent-ish frontend with the ability to choose api urls and allowlist urls
 
@@ -49,3 +48,4 @@ Create a decent-ish frontend with the ability to choose api urls and allowlist u
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forgoe this due to the ease of development.
 RLS is disabled for all tables in Supabase, this needs to be addressed at a later time
 Remove localhost from allowed origins for CORS
+Clerk Auth will always be in dev mode unless a domain is purchased (with valid DNS)
