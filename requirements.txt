@@ -7,7 +7,9 @@ click==8.3.1
 colorama==0.4.6
 cryptography==46.0.3
 deprecation==2.1.0
+dnspython==2.8.0
 dotenv==0.9.9
+email-validator==2.3.0
 fastapi==0.122.0
 h11==0.16.0
 h2==4.3.0
