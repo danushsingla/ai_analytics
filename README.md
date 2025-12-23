@@ -42,7 +42,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 # To Do
 Move Backend to backend/ folder
-Create sign in using clerk
 Connect each username with a specialized ID as well as what websites are registered under them (list of them) in Supabase - put that id in the URL
 Connect all of those website links to the allow list for CORS
 Create a small table in the frontend showing a list of websites they have
