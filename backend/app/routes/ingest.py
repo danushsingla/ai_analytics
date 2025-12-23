@@ -59,15 +59,19 @@ async def get_config(project_id: str):
     
 class RegisterUserRequest(BaseModel):
     email: EmailStr
+    id: str
 
 # When user signs into frontend, add them to the users table in Supabase and generate a unique id if they don't exist
 @router.post("/register_user")
 async def register_user(body: RegisterUserRequest):
     email = body.email
+    id = body.id
+    print(id)
+
     # Check if user already exists
-    response = supabase.table("users").select("*").eq("email", email).execute()
+    response = supabase.table("users").select("*").eq("user_id", id).execute()
     if response.data:
         return {"status": "exists", "user_id": response.data[0]["id"]}
     
-    # If user does not exist, create a new entry
-    insert_response = supabase.table("users").insert({"email": email}).execute()
+    # If user does not exist, create a new entry with the email and the user ID
+    supabase.table("users").insert({"email": email, "user_id": id}).execute()
