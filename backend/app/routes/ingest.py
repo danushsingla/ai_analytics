@@ -66,7 +66,6 @@ class RegisterUserRequest(BaseModel):
 async def register_user(body: RegisterUserRequest):
     email = body.email
     id = body.id
-    print(id)
 
     # Check if user already exists
     response = supabase.table("users").select("*").eq("user_id", id).execute()
