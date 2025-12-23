@@ -1,8 +1,7 @@
 "use client";
 
-import {use, useEffect, useRef} from 'react';
+import {useEffect} from 'react';
 import { useUser } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 
 export default function RegisterUserOnSignIn() {
     // Send user email to /register_user in the backend to talk to Supabase

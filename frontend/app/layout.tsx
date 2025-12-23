@@ -10,7 +10,7 @@ import {
 } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import RegisterUserOnSignIn from './RegisterUserOnSignIn'
+import RegisterUserOnSignIn from '../Components/RegisterUserOnSignIn'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

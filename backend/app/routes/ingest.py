@@ -49,7 +49,7 @@ async def get_config(project_id: str):
         return {"valid_urls": []}
     
     # Grab the response from Supabase
-    response = supabase.table("project_allowlist").select("api_urls").eq("project_id", project_id).execute()
+    response = supabase.table("projects").select("api_urls").eq("project_id", project_id).execute()
 
     # Return the list of valid URLs if they exist
     if response.data and "urls" in response.data[0]["api_urls"]:
@@ -74,3 +74,46 @@ async def register_user(body: RegisterUserRequest):
     
     # If user does not exist, create a new entry with the email and the user ID
     supabase.table("users").insert({"email": email, "user_id": id}).execute()
+    
+
+# When a user wishes to register a domain, add it to their allowlist in Supabase
+@router.post("/register_domain")
+async def register_domain(user_id: str, domain: str):
+    # Ensure user_id is valid
+    if not user_id or user_id in ["undefined", "null"]:
+        raise HTTPException(status_code=400, detail="Invalid user_id")
+    
+    # Grab the existing domains from Supabase if it exists
+    domains = get_domains()
+
+    # If the domain is already in the list, do nothing
+    if domain in domains.get("domains", []):
+        return {"status": "exists"}
+    
+    # Insert the new domain into the projects table
+    supabase.table("projects").insert({"user_id": user_id, "domain": domain}).execute()
+
+class DomainsRequest(BaseModel):
+    user_id: str
+
+# When loading user dashboard, grab their domain allowlist from Supabase
+@router.post("/get_domains")
+async def get_domains(payload: DomainsRequest):
+    user_id = payload.user_id
+
+    # Ensure user_id is valid
+    if not user_id or user_id in ["undefined", "null"]:
+        return {"domains": []}
+    
+    # Grab the response from Supabase
+    response = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
+
+    # Ensure there is a response
+    if not response.data:
+        return {"domains": []}
+    
+    # Grab each domain from each row
+    domains = [row["domain"] for row in response.data if row.get("domain")]
+
+    # Return the list of domains if they exist
+    return {"domains": domains}
