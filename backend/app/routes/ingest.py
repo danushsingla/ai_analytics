@@ -74,20 +74,44 @@ async def register_user(body: RegisterUserRequest):
     
     # If user does not exist, create a new entry with the email and the user ID
     supabase.table("users").insert({"email": email, "user_id": id}).execute()
+
+# Helper for /register_domain and /get_domains to grab all domains
+def get_domains_helper(user_id):
+    # Ensure user_id is valid
+    if not user_id or user_id in ["undefined", "null"]:
+        return {"domains": []}
     
+    # Grab the response from Supabase
+    response = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
+    print(response)
+
+    # Ensure there is a response
+    if not response.data:
+        return {"domains": []}
+    
+    # Grab each domain from each row
+    domains = [row["domain"] for row in response.data if row.get("domain")]
+
+    return domains
+
+class RegisterDomainRequest(BaseModel):
+    user_id: str
+    domain: str
 
 # When a user wishes to register a domain, add it to their allowlist in Supabase
 @router.post("/register_domain")
-async def register_domain(user_id: str, domain: str):
+async def register_domain(payload: RegisterDomainRequest):
+    user_id = payload.user_id
+    domain = payload.domain
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
         raise HTTPException(status_code=400, detail="Invalid user_id")
     
     # Grab the existing domains from Supabase if it exists
-    domains = get_domains()
+    domains = get_domains_helper(user_id)
 
     # If the domain is already in the list, do nothing
-    if domain in domains.get("domains", []):
+    if domain in domains:
         return {"status": "exists"}
     
     # Insert the new domain into the projects table
@@ -99,21 +123,7 @@ class DomainsRequest(BaseModel):
 # When loading user dashboard, grab their domain allowlist from Supabase
 @router.post("/get_domains")
 async def get_domains(payload: DomainsRequest):
+    print("CALLING GET DOMAINS")
     user_id = payload.user_id
-
-    # Ensure user_id is valid
-    if not user_id or user_id in ["undefined", "null"]:
-        return {"domains": []}
-    
-    # Grab the response from Supabase
-    response = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
-
-    # Ensure there is a response
-    if not response.data:
-        return {"domains": []}
-    
-    # Grab each domain from each row
-    domains = [row["domain"] for row in response.data if row.get("domain")]
-
-    # Return the list of domains if they exist
+    domains = get_domains_helper(user_id)
     return {"domains": domains}

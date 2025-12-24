@@ -1,4 +1,5 @@
 import RegisteredDomainsList from '@/Components/RegisteredDomainsList';
+import RegisterDomain from '@/Components/CreateDomain/RegisterDomain';
 import { redirect } from 'next/navigation';
 
 type PageProps = {
@@ -17,6 +18,7 @@ export default async function DashboardPage({ params }: Readonly<PageProps>) {
     return (
         <div>
             <RegisteredDomainsList />
+            <RegisterDomain />
         </div>
     );
 }
