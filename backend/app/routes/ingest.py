@@ -1,4 +1,5 @@
 import os
+import secrets
 from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.responses import Response
 from supabase import create_client, Client
@@ -114,8 +115,18 @@ async def register_domain(payload: RegisterDomainRequest):
     if domain in domains:
         return {"status": "exists"}
     
-    # Insert the new domain into the projects table
-    supabase.table("projects").insert({"user_id": user_id, "domain": domain}).execute()
+    # Do a while true loop to avoid api key collisions
+    while(True):
+        # Generate an api key for the new domain
+        api_key = "aia_pk_" + secrets.token_urlsafe(16)
+        
+        # Insert the new domain into the projects table, check if the api key meets a collision
+        try:
+            supabase.table("projects").insert({"user_id": user_id, "domain": domain, "public_api_key": api_key, "public_api_key_enabled": True}).execute()
+            break
+        except Exception as e:
+            continue
+    
 
 class DomainsRequest(BaseModel):
     user_id: str

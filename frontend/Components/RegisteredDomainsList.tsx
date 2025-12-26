@@ -21,7 +21,7 @@ export default async function RegisteredDomainsList() {
         return [];
     }
     const data = await res.json();
-    const domains: string[] = data.domains ?? [];
+    const domains = Array.isArray(data?.domains) ? data.domains : [];
 
     return (
         <div>
