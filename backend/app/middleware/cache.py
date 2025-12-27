@@ -51,7 +51,7 @@ def refresh_allowed_origins_cache_from_supabase():
 async def refresh_loop():
     while True:
         try:
-            await refresh_allowed_origins_cache_from_supabase()
+            refresh_allowed_origins_cache_from_supabase()
         except Exception as e:
             print(f"Error refreshing projects: {e}")
         await asyncio.sleep(60)
