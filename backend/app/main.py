@@ -18,7 +18,7 @@ app.include_router(ingest_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[("*")],    # allow everything, we check with internal cache later for matching api keys
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],
 )
