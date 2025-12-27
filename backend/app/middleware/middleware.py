@@ -3,25 +3,14 @@ from __future__ import annotations
 import functools
 import re
 from collections.abc import Sequence
-import os
 
 from starlette.datastructures import Headers, MutableHeaders
 from starlette.responses import PlainTextResponse, Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
-from supabase import create_client, Client
-from dotenv import load_dotenv
+from .cache import ALLOWED_CACHE
 
 ALL_METHODS = ("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT")
 SAFELISTED_HEADERS = {"Accept", "Accept-Language", "Content-Language", "Content-Type"}
-
-
-# Load .env.local by looking for the file one directory above
-load_dotenv(os.path.join(os.path.dirname(__file__), "../", ".env.local"))
-supabase_url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_SERVICE_KEY")
-
-# Create a Supabase client with the url and service key
-supabase: Client = create_client(supabase_url, key)
 
 class AIAnalyticsMiddleware:
     def __init__(
@@ -111,8 +100,8 @@ class AIAnalyticsMiddleware:
             return True
         
         # Full check that confirms api key is valid, enabled, and domain matches origin
-        if api_key and api_key in self.cache:
-            entry = self.cache[api_key]
+        if api_key and api_key in ALLOWED_CACHE:
+            entry = ALLOWED_CACHE[api_key]
             if entry["api_enabled"] and entry["domain"] == origin:
                 return True
             
@@ -173,6 +162,7 @@ class AIAnalyticsMiddleware:
         headers = MutableHeaders(scope=message)
         headers.update(self.simple_headers)
         origin = request_headers["Origin"]
+        api_key = request_headers.get("public-api-key")
         has_cookie = "cookie" in request_headers
 
         # If request includes any cookie headers, then we must respond
@@ -182,7 +172,7 @@ class AIAnalyticsMiddleware:
 
         # If we only allow specific origins, then we have to mirror back
         # the Origin header in the response.
-        elif not self.allow_all_origins and self.is_allowed_origin(origin=origin):
+        elif not self.allow_all_origins and self.is_allowed_origin(origin=origin, api_key=api_key):
             self.allow_explicit_origin(headers, origin)
 
         await send(message)
@@ -191,33 +181,3 @@ class AIAnalyticsMiddleware:
     def allow_explicit_origin(headers: MutableHeaders, origin: str) -> None:
         headers["Access-Control-Allow-Origin"] = origin
         headers.add_vary_header("Origin")
-
-    # Refresh the allowed origins cache
-    def refresh_allowed_origins_cache_from_supabase(self):
-        try:
-            # We will store the origins in a cache as follows: (pk_api: str) -> Dict[domain: str, api_enabled: bool]
-            response = supabase.table("projects").select("domain, public_api_key, public_api_key_enabled").execute()
-        except Exception as e:
-            print(f"Error fetching allowed origins from Supabase: {e}")
-            return
-
-        if response.data:
-            cache = {}
-
-            for row in response.data:
-                domains = row.get("domain")
-                api_enableds = row.get("public_api_key_enabled")
-                api_keys = row.get("public_api_key")
-
-                # Create the dict
-                if api_keys and domains and api_enableds is not None:
-                    cache[api_keys] = {"domain": domains, "api_enabled": api_enableds}
-                else:
-                    print(f"Invalid row data when refreshing allowed origins from Supabase: {row}")
-                
-            # Update cache - doing it this way to avoid empty cache if mid-refresh
-            self.cache = cache
-
-            print(cache)
-        else:
-            print("No data found when refreshing allowed origins from Supabase.")
