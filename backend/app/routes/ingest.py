@@ -69,7 +69,7 @@ async def get_config(public_api_key: str):
     response = supabase.table("projects").select("api_urls").eq("public_api_key", public_api_key).execute()
 
     # Return the list of valid URLs if they exist
-    if response.data and "urls" in response.data[0]["api_urls"]:
+    if response.data and response.data[0]["api_urls"] and "urls" in response.data[0]["api_urls"]:
         return {"valid_urls": response.data[0]["api_urls"]["urls"]}
     else:
         return {"valid_urls": []}
