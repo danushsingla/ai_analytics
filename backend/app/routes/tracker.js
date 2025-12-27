@@ -26,7 +26,7 @@
   var validUrls = [];
 
   // Call endpoint /config to get valid urls for this project
-  originalFetch("https://ai-analytics-7tka.onrender.com/config?public-api-key=" + encodeURIComponent(PUBLIC_API_KEY))
+  originalFetch("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY))
     .then(function (response) {
       if(!response.ok) {
         throw new Error("Network response was not ok");
@@ -75,7 +75,7 @@
     // Track request
     try{
       navigator.sendBeacon(
-        "https://ai-analytics-7tka.onrender.com/collect?public-api-key=" + encodeURIComponent(PUBLIC_API_KEY),
+        "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
         new Blob(
           [JSON.stringify({
             event_type: "user_input",
@@ -112,7 +112,7 @@
         try {
           // Track response WITH DATA
           navigator.sendBeacon(
-            "https://ai-analytics-7tka.onrender.com/collect?public-api-key=" + encodeURIComponent(PUBLIC_API_KEY),
+            "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
             new Blob(
               [JSON.stringify({
                 event_type: "ai_response",
@@ -134,7 +134,7 @@
         // Fallback if body cannot be read
         try {
           navigator.sendBeacon(
-            "https://ai-analytics-7tka.onrender.com/collect?public-api-key=" + encodeURIComponent(PUBLIC_API_KEY),
+            "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
             new Blob(
               [JSON.stringify({
                 event_type: "ai_response",
