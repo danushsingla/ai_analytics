@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from app.routes.ingest import router as ingest_router
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from .middleware.middleware import AIAnalyticsMiddleware
 from .middleware.cache import lifespan
+from fastapi.middleware.cors import CORSMiddleware
 
 # Load .env.local by looking for the file one directory above
 load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env.local"))
@@ -16,8 +16,8 @@ app.include_router(ingest_router)
 
 # Set up CORS middleware to allow requests from any origin
 app.add_middleware(
-    AIAnalyticsMiddleware,
-    allow_origins=["http://localhost:3000", os.getenv("NEXT_PUBLIC_FRONTEND_URL")],    # temporarily adding localhost, will need to figure out a list of allowed origins later
+    CORSMiddleware,
+    allow_origins=[("*")],    # allow everything, we check with internal cache later for matching api keys
     allow_credentials=True,
     allow_methods=["POST", "OPTIONS", "GET"],
     allow_headers=["*"],

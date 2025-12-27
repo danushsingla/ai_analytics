@@ -6,7 +6,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 
 # Load .env.local by looking for the file one directory above
-load_dotenv(os.path.join(os.path.dirname(__file__), "../", ".env.local"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
 supabase_url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_SERVICE_KEY")
 
@@ -35,7 +35,7 @@ def refresh_allowed_origins_cache_from_supabase():
 
             # Create the dict
             if api_keys and domains and api_enableds is not None:
-                NEW_CACHE[api_keys] = {"domain": domains, "api_enabled": api_enableds}
+                NEW_CACHE[api_keys] = {"domain": domains, "public_api_key_enabled": api_enableds}
             else:
                 print(f"Invalid row data when refreshing allowed origins from Supabase: {row}")
             

@@ -49,5 +49,5 @@ On that more info page, let them see which api urls were detected and to be able
 ## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forget this due to the ease of development.
 RLS is disabled for all tables in Supabase, this needs to be addressed at a later time
-Remove localhost from allowed origins for CORS
 Clerk Auth will always be in dev mode unless a domain is purchased (with valid DNS)
+Since public api key is used for confirming incoming requests, multiple security issues can happen (such as spam)

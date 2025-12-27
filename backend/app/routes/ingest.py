@@ -1,11 +1,12 @@
 import os
 import secrets
-from fastapi import FastAPI, APIRouter, HTTPException, Header
+from fastapi import FastAPI, APIRouter, HTTPException
 from fastapi.responses import Response
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
+from ..middleware.cache import ALLOWED_CACHE
 
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -18,10 +19,25 @@ supabase: Client = create_client(supabase_url, key)
 # Create a FastAPI router to help grab endpoints (like /collect)
 router = APIRouter()
 
+# Helper to confirm api key is valid
+def verify_public_api_key(public_api_key: str):
+    # Ensure public_api_key is valid
+    if not public_api_key or public_api_key in ["undefined", "null"]:
+        raise HTTPException(status_code=400, detail="Invalid public_api_key")
+    
+    # Check the cache to see if the api key is enabled
+    if public_api_key in ALLOWED_CACHE and ALLOWED_CACHE[public_api_key]["public_api_key_enabled"]:
+            return True
+    return False
+
 # Whenever someone writes POST to /collect then this happens
 @router.post("/collect")
 # Parses the JSON body and turns it into a Python dictionary
-async def collect_event(event: dict):
+async def collect_event(event: dict, public_api_key: str):
+    # Verify the public api key
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
     # Create a table in supabase called "events" and insert the event data
     response = supabase.table("events").insert(event).execute()
     return {"status": "ok", "data": response.data}
@@ -44,13 +60,13 @@ async def gtmtracker():
 
 # Access Supabase to return a list of api urls the client chose
 @router.get("/config")
-async def get_config(api_key: str = Header(None)):
+async def get_config(public_api_key: str):
     # Ensure project_id is valid
-    if not api_key or api_key in ["undefined", "null"]:
-        return {"valid_urls": []}
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
     
     # Grab the response from Supabase
-    response = supabase.table("projects").select("api_urls").eq("project_id", api_key).execute()
+    response = supabase.table("projects").select("api_urls").eq("public_api_key", public_api_key).execute()
 
     # Return the list of valid URLs if they exist
     if response.data and "urls" in response.data[0]["api_urls"]:
