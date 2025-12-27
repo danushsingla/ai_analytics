@@ -19,13 +19,19 @@
     // Grab the fetch to the backend
     var originalFetch = window.fetch;
 
-  // grab the project_id from the url (not entirely needed)
-  var PROJECT_ID = new URL(document.currentScript.src).searchParams.get("project_id");
+  // grab the api key from the script tag
+  const script = document.currentScript;
+  const API_KEY = script?.getAttribute("public-api-key");
 
   var validUrls = [];
 
   // Call endpoint /config to get valid urls for this project
-  originalFetch("https://ai-analytics-7tka.onrender.com/config?project_id=" + PROJECT_ID)
+  originalFetch("https://ai-analytics-7tka.onrender.com/config", {
+    method: "GET",
+    headers: {
+      'api-key': API_KEY
+    },
+  })
     .then(function (response) {
       if(!response.ok) {
         throw new Error("Network response was not ok");

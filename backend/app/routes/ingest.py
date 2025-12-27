@@ -1,13 +1,13 @@
 import os
 import secrets
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Header
 from fastapi.responses import Response
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
 
-# Load .env.local by looking for the file twp directories above
+# Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
 supabase_url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_SERVICE_KEY")
@@ -44,13 +44,13 @@ async def gtmtracker():
 
 # Access Supabase to return a list of api urls the client chose
 @router.get("/config")
-async def get_config(project_id: str):
+async def get_config(api_key: str = Header(None)):
     # Ensure project_id is valid
-    if not project_id or project_id in ["undefined", "null"]:
+    if not api_key or api_key in ["undefined", "null"]:
         return {"valid_urls": []}
     
     # Grab the response from Supabase
-    response = supabase.table("projects").select("api_urls").eq("project_id", project_id).execute()
+    response = supabase.table("projects").select("api_urls").eq("project_id", api_key).execute()
 
     # Return the list of valid URLs if they exist
     if response.data and "urls" in response.data[0]["api_urls"]:
@@ -84,7 +84,6 @@ def get_domains_helper(user_id):
     
     # Grab the response from Supabase
     response = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
-    print(response)
 
     # Ensure there is a response
     if not response.data:
@@ -134,7 +133,6 @@ class DomainsRequest(BaseModel):
 # When loading user dashboard, grab their domain allowlist from Supabase
 @router.post("/get_domains")
 async def get_domains(payload: DomainsRequest):
-    print("CALLING GET DOMAINS")
     user_id = payload.user_id
     domains = get_domains_helper(user_id)
     return {"domains": domains}

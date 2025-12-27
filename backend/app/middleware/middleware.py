@@ -3,14 +3,25 @@ from __future__ import annotations
 import functools
 import re
 from collections.abc import Sequence
+import os
 
 from starlette.datastructures import Headers, MutableHeaders
 from starlette.responses import PlainTextResponse, Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
 ALL_METHODS = ("DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT")
 SAFELISTED_HEADERS = {"Accept", "Accept-Language", "Content-Language", "Content-Type"}
 
+
+# Load .env.local by looking for the file one directory above
+load_dotenv(os.path.join(os.path.dirname(__file__), "../", ".env.local"))
+supabase_url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_SERVICE_KEY")
+
+# Create a Supabase client with the url and service key
+supabase: Client = create_client(supabase_url, key)
 
 class AIAnalyticsMiddleware:
     def __init__(
@@ -92,13 +103,20 @@ class AIAnalyticsMiddleware:
 
         await self.simple_response(scope, receive, send, request_headers=headers)
 
-    def is_allowed_origin(self, origin: str) -> bool:
+    def is_allowed_origin(self, origin: str, api_key: str) -> bool:
         if self.allow_all_origins:
             return True
 
         if self.allow_origin_regex is not None and self.allow_origin_regex.fullmatch(origin):
             return True
-
+        
+        # Full check that confirms api key is valid, enabled, and domain matches origin
+        if api_key and api_key in self.cache:
+            entry = self.cache[api_key]
+            if entry["api_enabled"] and entry["domain"] == origin:
+                return True
+            
+        # Hardcode check for the actual frontend
         return origin in self.allow_origins
 
     def preflight_response(self, request_headers: Headers) -> Response:
@@ -109,7 +127,10 @@ class AIAnalyticsMiddleware:
         headers = dict(self.preflight_headers)
         failures = []
 
-        if self.is_allowed_origin(origin=requested_origin):
+        # Read the api key from headers to confirm allowed origins
+        api_key = request_headers.get("public-api-key")
+
+        if self.is_allowed_origin(origin=requested_origin, api_key=api_key):
             if self.preflight_explicit_allow_origin:
                 # The "else" case is already accounted for in self.preflight_headers
                 # and the value would be "*".
@@ -171,7 +192,32 @@ class AIAnalyticsMiddleware:
         headers["Access-Control-Allow-Origin"] = origin
         headers.add_vary_header("Origin")
 
-    # # Refresh the list of allowed origins from supabase
-    # def refresh_allowed_origins(self, new_origins: Sequence[str]) -> None:
-    #     self.allow_origins = new_origins
-    #     self.allow_all_origins = "*" in new_origins
+    # Refresh the allowed origins cache
+    def refresh_allowed_origins_cache_from_supabase(self):
+        try:
+            # We will store the origins in a cache as follows: (pk_api: str) -> Dict[domain: str, api_enabled: bool]
+            response = supabase.table("projects").select("domain, public_api_key, public_api_key_enabled").execute()
+        except Exception as e:
+            print(f"Error fetching allowed origins from Supabase: {e}")
+            return
+
+        if response.data:
+            cache = {}
+
+            for row in response.data:
+                domains = row.get("domain")
+                api_enableds = row.get("public_api_key_enabled")
+                api_keys = row.get("public_api_key")
+
+                # Create the dict
+                if api_keys and domains and api_enableds is not None:
+                    cache[api_keys] = {"domain": domains, "api_enabled": api_enableds}
+                else:
+                    print(f"Invalid row data when refreshing allowed origins from Supabase: {row}")
+                
+            # Update cache - doing it this way to avoid empty cache if mid-refresh
+            self.cache = cache
+
+            print(cache)
+        else:
+            print("No data found when refreshing allowed origins from Supabase.")

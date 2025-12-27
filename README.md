@@ -44,7 +44,7 @@ Something to note for the tracker script: If you want to run the script directly
 Connect all of those website links to the allow list for CORS
 Create a small table in the frontend showing a list of websites they have
 Make each row clickable so they can see all of the info for that site (all of the analytics)
-On that more info page, let them see which api urls were detected and to be able to select which ones they want tracked
+On that more info page, let them see which api urls were detected and to be able to select which ones they want tracked - Revamp api urls due to shift using public api key rather than project id as identifier
 
 ## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forget this due to the ease of development.
