@@ -29,7 +29,7 @@
   originalFetch("https://ai-analytics-7tka.onrender.com/config", {
     method: "GET",
     headers: {
-      'api-key': API_KEY
+      'public-api-key': API_KEY
     },
   })
     .then(function (response) {
@@ -83,7 +83,6 @@
         "https://ai-analytics-7tka.onrender.com/collect",
         new Blob(
           [JSON.stringify({
-            project_id: "aianalyticstest",
             event_type: "user_input",
             request_id: requestId,
             payload: {
@@ -121,7 +120,6 @@
             "https://ai-analytics-7tka.onrender.com/collect",
             new Blob(
               [JSON.stringify({
-                project_id: "aianalyticstest",
                 event_type: "ai_response",
                 request_id: requestId,
                 payload: {
@@ -144,7 +142,6 @@
             "https://ai-analytics-7tka.onrender.com/collect",
             new Blob(
               [JSON.stringify({
-                project_id: "aianalyticstest",
                 event_type: "ai_response",
                 request_id: requestId,
                 payload: {
