@@ -165,6 +165,9 @@ async def register_domain(payload: RegisterDomainRequest):
             break
         except Exception as e:
             continue
+
+    # When a project is officially registered, I need to update the project_api_urls table to have an entry for this api key
+    supabase.table("project_api_urls").insert({"project_api_key": api_key, "all_api_urls": {"urls": []}, "valid_api_urls": {"urls": []}}).execute()
     
 
 class DomainsRequest(BaseModel):
