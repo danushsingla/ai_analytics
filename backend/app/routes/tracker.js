@@ -65,7 +65,7 @@
       allUrls.push(url);
 
       // Send the updated allUrls to the backend
-      originalFetch(("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY) + "&new_url=" + encodeURIComponent(url)))
+      originalFetch(("https://ai-analytics-7tka.onrender.com/update_api_urls?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY) + "&new_url=" + encodeURIComponent(url)))
         .then(function (response) {
           if(!response.ok) {
             throw new Error("Network response was not ok");
