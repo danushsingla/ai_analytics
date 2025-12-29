@@ -66,13 +66,37 @@ async def get_config(public_api_key: str):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
     
     # Grab the response from Supabase
-    response = supabase.table("projects").select("api_urls").eq("public_api_key", public_api_key).execute()
+    response_all = supabase.table("project_api_urls").select("all_api_urls").eq("project_api_key", public_api_key).execute()
+    response_valid = supabase.table("project_api_urls").select("valid_api_urls").eq("project_api_key", public_api_key).execute()
 
-    # Return the list of valid URLs if they exist
-    if response.data and response.data[0]["api_urls"] and "urls" in response.data[0]["api_urls"]:
-        return {"valid_urls": response.data[0]["api_urls"]["urls"]}
+    # Return the list of valid and all URLs if they exist
+    if response_all.data and response_all.data[0]["all_api_urls"] and "urls" in response_all.data[0]["all_api_urls"] \
+    and response_valid.data and response_valid.data[0]["valid_api_urls"] and "urls" in response_valid.data[0]["valid_api_urls"]:
+        return {"valid_urls": response_valid.data[0]["valid_api_urls"]["urls"], "all_urls": response_all.data[0]["all_api_urls"].get("all_urls", [])}
     else:
-        return {"valid_urls": []}
+        return {"valid_urls": [], "all_urls": []}
+    
+# Update all api urls for the project if a new one is seen
+@router.post("/update_api_urls")
+async def update_api_urls(public_api_key: str, new_url: str):
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab the existing api urls from Supabase
+    response = supabase.table("project_api_urls").select("all_api_urls").eq("project_api_key", public_api_key).execute()
+
+    all_urls = []
+    if response.data and response.data[0]["all_api_urls"] and "urls" in response.data[0]["all_api_urls"]:
+        all_urls = response.data[0]["all_api_urls"]["urls"]
+    
+    # If the new url is not in the list, add it
+    if new_url not in all_urls:
+        all_urls.append(new_url)
+        # Update the row in Supabase
+        supabase.table("project_api_urls").update({"all_api_urls": {"urls": all_urls}}).eq("project_api_key", public_api_key).execute()
+    
+    return {"all_urls": all_urls}
     
 class RegisterUserRequest(BaseModel):
     email: EmailStr

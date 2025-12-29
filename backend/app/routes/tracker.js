@@ -23,9 +23,13 @@
   const script = document.currentScript;
   const PUBLIC_API_KEY = script?.getAttribute("public-api-key");
 
+  // Store valid urls here chosen by the user
   var validUrls = [];
 
-  // Call endpoint /config to get valid urls for this project
+  // Store all urls ever fetched here
+  var allUrls = [];
+
+  // Call endpoint /config to get valid and all urls for this project
   originalFetch("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY))
     .then(function (response) {
       if(!response.ok) {
@@ -35,7 +39,8 @@
       return response.json();
     })
     .then(function (data) {
-      if(data && Array.isArray(data.valid_urls)) {
+      if(data && Array.isArray(data.valid_urls) && Array.isArray(data.all_urls)) {
+        allUrls = data.all_urls;
         validUrls = data.valid_urls;
       } else {
         validUrls = [];
@@ -43,7 +48,8 @@
     })
     .catch(function (e) {
       console.warn("Error fetching config for AI Analytics:", e);
-      // In case of error, just keep going with empty validUrls
+      // In case of error, just keep going with empty validUrls and allUrls
+      allUrls = [];
       validUrls = [];
     });
 
@@ -51,6 +57,28 @@
   window.fetch = function () {
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
+    
+    // Store all urls ever seen
+    if (!allUrls.includes(url)) {
+      allUrls.push(url);
+
+      // Send the updated allUrls to the backend
+      originalFetch(("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY) + "&new_url=" + encodeURIComponent(url)))
+        .then(function (response) {
+          if(!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+    
+          return response.json();
+      }).then(function (data) {
+        // Update allUrls
+        if(data && Array.isArray(data.all_urls)) {
+          allUrls = data.all_urls;
+        }
+      }).catch(function (e) {
+        // Just fail silently
+      });
+    }
 
     // Before doing anything else, check if this url is in the list of valid urls
     if (!validUrls.includes(url)) {
