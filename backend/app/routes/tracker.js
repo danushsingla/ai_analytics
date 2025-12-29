@@ -57,6 +57,8 @@
   window.fetch = function () {
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
+    console.log("Fetch called for URL:", url);
+    console.log("API Key:", PUBLIC_API_KEY);
     
     // Store all urls ever seen
     if (!allUrls.includes(url)) {
@@ -76,7 +78,7 @@
           allUrls = data.all_urls;
         }
       }).catch(function (e) {
-        // Just fail silently
+        console.warn("Error updating all URLs for AI Analytics:", e);
       });
     }
 

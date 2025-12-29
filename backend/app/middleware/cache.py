@@ -42,8 +42,6 @@ def refresh_allowed_origins_cache_from_supabase():
         # Update cache - doing it this way to avoid empty cache if mid-refresh
         ALLOWED_CACHE.clear()
         ALLOWED_CACHE.update(NEW_CACHE)
-
-        print(ALLOWED_CACHE)
     else:
         print("No data found when refreshing allowed origins from Supabase.")
 
