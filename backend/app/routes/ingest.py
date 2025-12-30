@@ -52,7 +52,7 @@ async def collect_event(event: dict, public_api_key: str):
     if event.get("event_type") == "ai_response":
         # Now, let's get the request timestamp from supabase that has the corresponding request_id
         request_id = event.get("request_id")
-        request_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "api_request").execute()
+        request_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_request").execute()
         if request_response.data and len(request_response.data) > 0:
             request_ts = request_response.data[0]["timestamp"]
             response_ts = event.get("timestamp")
