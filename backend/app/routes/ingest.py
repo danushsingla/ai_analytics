@@ -51,14 +51,18 @@ async def collect_event(event: dict, public_api_key: str):
     ''' After inserting the data, if this is an ai_response or user_request event, ensure the other is in supabase and calculate latency '''
     if event.get("event_type") == "ai_response":
         # Check supabase for ai_request with same request_id
-        request_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "ai_request").limit(1).execute()
+        request_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_request").limit(1).execute()
         if request_response.data and len(request_response.data) > 0:
-            calculate_latency(public_api_key, event.get("payload")["url"], request_response.data[0]["timestamp"], event.get("timestamp"), request_id)
+            # Grab the response timestamp from the supabase entry rather than the events
+            response_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_response").limit(1).execute()
+            calculate_latency(public_api_key, event.get("payload")["url"], request_response.data[0]["created_at"], response_response.data[0]["created_at"], request_id)
     elif event.get("event_type") == "ai_request":
         # Check supabase for ai_response with same request_id
-        response_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "ai_response").limit(1).execute()
+        response_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_response").limit(1).execute()
         if response_response.data and len(response_response.data) > 0:
-            calculate_latency(public_api_key, event.get("payload")["url"], event.get("timestamp"), response_response.data[0]["timestamp"], request_id)     
+            # Grab the request timestamp from the supabase entry rather than the events
+            request_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_request").limit(1).execute()
+            calculate_latency(public_api_key, event.get("payload")["url"], request_response.data[0]["created_at"], response_response.data[0]["created_at"], request_id)     
 
     return {"status": "ok", "data": response.data}
 
