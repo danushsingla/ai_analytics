@@ -1,5 +1,6 @@
 // Server Component
 import { auth } from '@clerk/nextjs/server';
+import APIUrlList from './APIUrlList';
 
 export default async function RegisteredDomainsList() {
     const { userId } = await auth();
@@ -22,6 +23,7 @@ export default async function RegisteredDomainsList() {
     }
     const data = await res.json();
     const domains = Array.isArray(data?.domains) ? data.domains : [];
+    const api_keys = Array.isArray(data?.api_keys) ? data.api_keys : [];
 
     return (
         <div>
@@ -29,7 +31,9 @@ export default async function RegisteredDomainsList() {
             <ul>
                 { domains.length === 0 ? ( <li>No registered domains found.</li> ) :
                 domains.map((domain: string) => (
-                    <li key={domain} className="mb-2">{domain}</li>
+                    <li key={domain} className="mb-2">{domain}
+                    <APIUrlList domain={domain} public_api_key={api_keys[domains.indexOf(domain)]} />
+                    </li>
                 ))}
             </ul>
         </div>
