@@ -52,13 +52,12 @@
       allUrls = [];
       validUrls = [];
     });
+    console.log("Valid Urls:", validUrls);
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
     // url is of the form "/api/chat" from the backend server, never the full url
     var url = arguments[0];
-    console.log("Fetch called for URL:", url);
-    console.log("API Key:", PUBLIC_API_KEY);
     
     // Store all urls ever seen
     if (!allUrls.includes(url)) {
@@ -83,8 +82,6 @@
         console.warn("Error updating all URLs for AI Analytics:", e);
       });
     }
-
-    console.log("Valid URLs:", validUrls);
 
     // Before doing anything else, check if this url is in the list of valid urls
     if (!validUrls.includes(url)) {

@@ -63,7 +63,7 @@ async def gtmtracker():
 
 # Access Supabase to return a list of api urls the client chose
 @router.get("/config")
-async def get_config(public_api_key: str):
+async def config(public_api_key: str):
     # Ensure project_id is valid
     if not verify_public_api_key(public_api_key):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
@@ -75,7 +75,7 @@ async def get_config(public_api_key: str):
     # Return the list of valid and all URLs if they exist
     if response_all.data and response_all.data[0]["all_api_urls"] and "urls" in response_all.data[0]["all_api_urls"] \
     and response_valid.data and response_valid.data[0]["valid_api_urls"] and "urls" in response_valid.data[0]["valid_api_urls"]:
-        return {"valid_urls": response_valid.data[0]["valid_api_urls"]["urls"], "all_urls": response_all.data[0]["all_api_urls"].get("all_urls", [])}
+        return {"valid_urls": response_valid.data[0]["valid_api_urls"]["urls"], "all_urls": response_all.data[0]["all_api_urls"]["urls"]}
     else:
         return {"valid_urls": [], "all_urls": []}
     
