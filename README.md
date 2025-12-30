@@ -41,8 +41,8 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Create a small table in the frontend showing a list of websites they have
-Make each row clickable so they can see all of the info for that site (all of the analytics)
+Create the tracker site for each website showing all info being analyzed
+Create a table in the frontend showing a list of websites they have
 More testing must be done to ensure security of using an api key with the use of api urls selection
 
 ## Huge Security Violations
