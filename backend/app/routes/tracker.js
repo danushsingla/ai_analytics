@@ -108,11 +108,11 @@
     try{
       navigator.sendBeacon(
         "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
+        { credentials: "omit" },
         new Blob(
           [JSON.stringify({
             event_type: "user_input",
             request_id: requestId,
-            credentials: "omit",
             payload: {
               url: url,
               method: method,
@@ -146,11 +146,11 @@
           // Track response WITH DATA
           navigator.sendBeacon(
             "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
+            { credentials: "omit" },
             new Blob(
               [JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
-                credentials: "omit",
                 payload: {
                   url: url,
                   status: response.status,
@@ -169,11 +169,11 @@
         try {
           navigator.sendBeacon(
             "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
+            { credentials: "omit" },
             new Blob(
               [JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
-                credentials: "omit",
                 payload: {
                   url: url,
                   status: response.status,
