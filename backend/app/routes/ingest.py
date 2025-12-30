@@ -38,7 +38,10 @@ async def collect_event(event: dict, public_api_key: str):
     if not verify_public_api_key(public_api_key):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
     
-    # Create a table in supabase called "events" and insert the event data
+    # Add the public_api_key to the event data
+    event["project_api_key"] = public_api_key
+    
+    # Insert the event data
     response = supabase.table("events").insert(event).execute()
     return {"status": "ok", "data": response.data}
 
