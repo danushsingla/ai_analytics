@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-On that more info page, let them see which api urls were detected and to be able to select which ones they want tracked - 
 Create a small table in the frontend showing a list of websites they have
 Make each row clickable so they can see all of the info for that site (all of the analytics)
 More testing must be done to ensure security of using an api key with the use of api urls selection
