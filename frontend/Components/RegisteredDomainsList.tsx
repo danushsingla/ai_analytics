@@ -1,6 +1,7 @@
 // Server Component
 import { auth } from '@clerk/nextjs/server';
 import APIUrlList from './APIUrlList';
+import VisitAnalysisSiteButton from './VisitAnalysisSiteButton';
 
 export default async function RegisteredDomainsList() {
     const { userId } = await auth();
@@ -33,6 +34,7 @@ export default async function RegisteredDomainsList() {
                 domains.map((domain: string) => (
                     <li key={domain} className="mb-2">{domain}
                     <APIUrlList domain={domain} public_api_key={api_keys[domains.indexOf(domain)]} />
+                    <VisitAnalysisSiteButton publicApiKey={api_keys[domains.indexOf(domain)]}/>
                     </li>
                 ))}
             </ul>

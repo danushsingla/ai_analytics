@@ -1,6 +1,6 @@
 import os
 import secrets
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from supabase import create_client, Client
 from dotenv import load_dotenv
