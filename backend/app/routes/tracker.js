@@ -39,6 +39,7 @@
       return response.json();
     })
     .then(function (data) {
+      console.log("Config data received for AI Analytics:", data);
       if(data && Array.isArray(data.valid_urls) && Array.isArray(data.all_urls)) {
         allUrls = data.all_urls;
         validUrls = data.valid_urls;
