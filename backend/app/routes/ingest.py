@@ -49,7 +49,7 @@ async def collect_event(event: dict, public_api_key: str):
     ''' After inserting the data, calculate latency between request and response time and populate the latency_events table '''
 
     # First, we will only send latency_event if the event type is 'api_response'
-    if event.get("event_type") == "api_response":
+    if event.get("event_type") == "ai_response":
         # Now, let's get the request timestamp from supabase that has the corresponding request_id
         request_id = event.get("request_id")
         request_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "api_request").execute()
