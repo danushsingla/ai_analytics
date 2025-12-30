@@ -120,19 +120,29 @@ async def register_user(body: RegisterUserRequest):
 def get_domains_helper(user_id):
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
-        return {"domains": []}
+        return {"domains": [], "api_keys": []}
     
-    # Grab the response from Supabase
-    response = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
+    # Grab the response from Supabase for domains
+    response_domains = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
+
+    # Ensure there is a response
+    if not response_domains.data:
+        return {"domains": [], "api_keys": []}
+    
+    # Grab each domain from each row
+    domains = [row["domain"] for row in response_domains.data if row.get("domain")]
+
+    # Grab the response from Supabase for api keys
+    response = supabase.table("projects").select("public_api_key").eq("user_id", user_id).execute()
 
     # Ensure there is a response
     if not response.data:
-        return {"domains": []}
+        return {"domains": domains, "api_keys": []}
     
-    # Grab each domain from each row
-    domains = [row["domain"] for row in response.data if row.get("domain")]
+    # Grab each api key from each row
+    api_keys = [row["public_api_key"] for row in response.data if row.get("public_api_key")]
 
-    return domains
+    return domains, api_keys
 
 class RegisterDomainRequest(BaseModel):
     user_id: str
@@ -148,7 +158,7 @@ async def register_domain(payload: RegisterDomainRequest):
         raise HTTPException(status_code=400, detail="Invalid user_id")
     
     # Grab the existing domains from Supabase if it exists
-    domains = get_domains_helper(user_id)
+    domains, api_keys = get_domains_helper(user_id)
 
     # If the domain is already in the list, do nothing
     if domain in domains:
@@ -177,5 +187,69 @@ class DomainsRequest(BaseModel):
 @router.post("/get_domains")
 async def get_domains(payload: DomainsRequest):
     user_id = payload.user_id
-    domains = get_domains_helper(user_id)
-    return {"domains": domains}
+    domains, api_keys = get_domains_helper(user_id)
+    return {"domains": domains, "api_keys": api_keys}
+
+# When loading user dashboard, grab all of their api urls from Supabase
+@router.get("/get_api_urls")
+async def get_api_urls(public_api_key: str):
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+        
+    # Grab the response from Supabase
+    response = supabase.table("project_api_urls").select("all_api_urls", "valid_api_urls").eq("project_api_key", public_api_key).execute()
+
+    # Return the list of valid and all URLs if they exist
+    if response.data and response.data[0]["all_api_urls"] and "urls" in response.data[0]["all_api_urls"] and "urls" in response.data[0]["valid_api_urls"]:
+        return {"valid_urls": response.data[0]["valid_api_urls"]["urls"], "all_urls": response.data[0]["all_api_urls"]["urls"]}
+
+class UpdateValidURLsRequest(BaseModel):
+    public_api_key: str
+    url: str
+
+# When a checkbox is ticked, add the url to the valid list
+@router.post("/add_valid_api_url")
+async def add_valid_url(payload: UpdateValidURLsRequest):
+    public_api_key = payload.public_api_key
+    url = payload.url
+
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab the existing valid api urls from Supabase
+    response = supabase.table("project_api_urls").select("valid_api_urls").eq("project_api_key", public_api_key).execute()
+
+    valid_urls = []
+    if response.data and response.data[0]["valid_api_urls"] and "urls" in response.data[0]["valid_api_urls"]:
+        valid_urls = response.data[0]["valid_api_urls"]["urls"]
+    
+    # If the url is not in the list, add it
+    if url not in valid_urls:
+        valid_urls.append(url)
+        # Update the row in Supabase
+        supabase.table("project_api_urls").update({"valid_api_urls": {"urls": valid_urls}}).eq("project_api_key", public_api_key).execute()
+
+# When a checkbox is unticked, remove the url from the valid list
+@router.post("/remove_valid_api_url")
+async def remove_valid_url(payload: UpdateValidURLsRequest):
+    public_api_key = payload.public_api_key
+    url = payload.url
+
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab the existing valid api urls from Supabase
+    response = supabase.table("project_api_urls").select("valid_api_urls").eq("project_api_key", public_api_key).execute()
+
+    valid_urls = []
+    if response.data and response.data[0]["valid_api_urls"] and "urls" in response.data[0]["valid_api_urls"]:
+        valid_urls = response.data[0]["valid_api_urls"]["urls"]
+    
+    # If the url is in the list, remove it
+    if url in valid_urls:
+        valid_urls.remove(url)
+        # Update the row in Supabase
+        supabase.table("project_api_urls").update({"valid_api_urls": {"urls": valid_urls}}).eq("project_api_key", public_api_key).execute()

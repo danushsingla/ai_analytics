@@ -112,6 +112,7 @@
           [JSON.stringify({
             event_type: "user_input",
             request_id: requestId,
+            credentials: "omit",
             payload: {
               url: url,
               method: method,
@@ -149,6 +150,7 @@
               [JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
+                credentials: "omit",
                 payload: {
                   url: url,
                   status: response.status,
@@ -171,6 +173,7 @@
               [JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
+                credentials: "omit",
                 payload: {
                   url: url,
                   status: response.status,
