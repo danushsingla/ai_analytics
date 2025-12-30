@@ -48,7 +48,6 @@
       allUrls = [];
       validUrls = [];
     });
-    console.log("Valid Urls:", validUrls);
 
   // This will be able to grab any fetch request made by the app
   window.fetch = function () {
