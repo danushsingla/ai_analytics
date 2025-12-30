@@ -106,12 +106,16 @@
 
     // Track request
     try{
-      navigator.sendBeacon(
+      // Send it all through
+      originalFetch(
         "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
-        { credentials: "omit" },
-        new Blob(
-          [JSON.stringify({
-            event_type: "user_input",
+        {
+          method: "POST",
+          credentials: "omit",
+          mode: "cors",
+          keepalive: true,
+          body: JSON.stringify({
+            event_type: "ai_request",
             request_id: requestId,
             payload: {
               url: url,
@@ -119,9 +123,9 @@
               body: requestBody,
               timestamp: Date.now()
             }
-          })],
-          { type: "application/json" }
-        )
+          }),
+          headers: { "Content-Type": "application/json" }
+        }
       );
     } catch(e) {}
     
@@ -144,22 +148,25 @@
         // Send it all through
         try {
           // Track response WITH DATA
-          navigator.sendBeacon(
+          originalFetch(
             "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
-            { credentials: "omit" },
-            new Blob(
-              [JSON.stringify({
+            {
+              method: "POST",
+              credentials: "omit",
+              mode: "cors",
+              keepalive: true,
+              body: JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
                 payload: {
                   url: url,
                   status: response.status,
-                  body: bodyText ? bodyText.slice(0, 5000) : null, // limit so you don’t send huge payloads
+                  body: bodyText ? String(bodyText).slice(0,5000) : null, // Consolidating it to 5000 chars
                   timestamp: Date.now()
                 }
-              })],
-              { type: "application/json" }
-            )
+              }),
+              headers: { "Content-Type": "application/json" }
+            }
           );
         } catch (e) {}
 
@@ -167,11 +174,15 @@
       }).catch(function () {
         // Fallback if body cannot be read
         try {
-          navigator.sendBeacon(
+          // Track response WITHOUT DATA
+          originalFetch(
             "https://ai-analytics-7tka.onrender.com/collect?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
-            { credentials: "omit" },
-            new Blob(
-              [JSON.stringify({
+            {
+              method: "POST",
+              credentials: "omit",
+              mode: "cors",
+              keepalive: true,
+              body: JSON.stringify({
                 event_type: "ai_response",
                 request_id: requestId,
                 payload: {
@@ -180,9 +191,9 @@
                   body: null,
                   timestamp: Date.now()
                 }
-              })],
-              { type: "application/json" }
-            )
+              }),
+              headers: { "Content-Type": "application/json" }
+            }
           );
         } catch (e) {}
 
