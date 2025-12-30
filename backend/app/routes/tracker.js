@@ -84,6 +84,8 @@
       });
     }
 
+    console.log("Valid URLs:", validUrls);
+
     // Before doing anything else, check if this url is in the list of valid urls
     if (!validUrls.includes(url)) {
       // If not, just call the original fetch and return
