@@ -39,13 +39,8 @@
       return response.json();
     })
     .then(function (data) {
-      console.log("Config data received for AI Analytics:", data);
-      if(data && Array.isArray(data.valid_urls) && Array.isArray(data.all_urls)) {
-        allUrls = data.all_urls;
-        validUrls = data.valid_urls;
-      } else {
-        validUrls = [];
-      }
+      validUrls = Array.isArray(data.valid_urls) ? data.valid_urls : [];
+      allUrls = Array.isArray(data.all_urls) ? data.all_urls : [];
     })
     .catch(function (e) {
       console.warn("Error fetching config for AI Analytics:", e);
