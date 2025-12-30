@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
 from ..middleware.cache import ALLOWED_CACHE
+from analysis import calculate_latency
 
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -44,27 +45,21 @@ async def collect_event(event: dict, public_api_key: str):
     # Insert the event data
     response = supabase.table("events").insert(event).execute()
 
-    ''' After inserting the data, calculate latency between request and response time and populate the latency_events table '''
+    # Grab the request_id
+    request_id = event.get("request_id")
 
-    # First, we will only send latency_event if the event type is 'api_response'
+    ''' After inserting the data, if this is an ai_response or user_request event, ensure the other is in supabase and calculate latency '''
     if event.get("event_type") == "ai_response":
-        # Now, let's get the request timestamp from supabase that has the corresponding request_id
-        request_id = event.get("request_id")
-        request_response = supabase.table("events").select("created_at").eq("request_id", request_id).eq("event_type", "ai_request").execute()
+        # Check supabase for ai_request with same request_id
+        request_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "ai_request").limit(1).execute()
         if request_response.data and len(request_response.data) > 0:
-            request_ts = request_response.data[0]["created_at"]
-            response_ts = event.get("timestamp")
-        
-        latency_event = {
-            "project_api_key": public_api_key,
-            "endpoint": event.get("payload")["url"],
-            "request_ts": request_ts,
-            "response_ts": response_ts,
-            "latency_ms": (response_ts - request_ts) * 1000  # Convert to milliseconds
-        }
+            calculate_latency(public_api_key, event.get("payload")["url"], request_response.data[0]["timestamp"], event.get("timestamp"), request_id)
+    elif event.get("event_type") == "ai_request":
+        # Check supabase for ai_response with same request_id
+        response_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "ai_response").limit(1).execute()
+        if response_response.data and len(response_response.data) > 0:
+            calculate_latency(public_api_key, event.get("payload")["url"], event.get("timestamp"), response_response.data[0]["timestamp"], request_id)     
 
-        # Insert the latency event into the latency_events table
-        supabase.table("latency_events").insert(latency_event).execute()
     return {"status": "ok", "data": response.data}
 
 # Set the path of the tracker.js file which holds my HTML code
