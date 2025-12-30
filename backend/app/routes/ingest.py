@@ -43,6 +43,30 @@ async def collect_event(event: dict, public_api_key: str):
     
     # Insert the event data
     response = supabase.table("events").insert(event).execute()
+
+    print(event)
+
+    ''' After inserting the data, calculate latency between request and response time and populate the latency_events table '''
+
+    # First, we will only send latency_event if the event type is 'api_response'
+    if event.get("event_type") == "api_response":
+        # Now, let's get the request timestamp from supabase that has the corresponding request_id
+        request_id = event.get("request_id")
+        request_response = supabase.table("events").select("timestamp").eq("request_id", request_id).eq("event_type", "api_request").execute()
+        if request_response.data and len(request_response.data) > 0:
+            request_ts = request_response.data[0]["timestamp"]
+            response_ts = event.get("timestamp")
+        
+        latency_event = {
+            "project_api_key": public_api_key,
+            "endpoint": event.get("payload")["url"],
+            "request_ts": request_ts,
+            "response_ts": response_ts,
+            "latency_ms": (response_ts - request_ts) * 1000  # Convert to milliseconds
+        }
+
+        # Insert the latency event into the latency_events table
+        supabase.table("latency_events").insert(latency_event).execute()
     return {"status": "ok", "data": response.data}
 
 # Set the path of the tracker.js file which holds my HTML code

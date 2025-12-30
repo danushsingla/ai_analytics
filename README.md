@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Create the tracker site for each website showing all info being analyzed
 Create a table in the frontend showing a list of websites they have
 More testing must be done to ensure security of using an api key with the use of api urls selection
 Create listening schema since grabbing api data can vary per call
@@ -53,10 +52,12 @@ Clerk Auth will always be in dev mode unless a domain is purchased (with valid D
 Since public api key is used for confirming incoming requests, multiple security issues can happen (such as spam)
 
 # Analysis
-Semantic Analysis (how does the customer feel talking to the AI?)
-Latency Analysis (how fast the AI can respond to queries?)
-Usage Rate (How much is the AI used compared to other services?)
-Human-Sounding Rate (How much does AI sound like a human? We could provide examples of real responses from the AI for management to analyze)
-Breach Analysis - Analyze cases of potential breaches in private information
-Usage/Traffic Analysis - Note how often usage in the AI changes over time (graph)
-API Usage for the AI - Analyzing the cost of the AI based on the model used
+## Semantic Analysis (how does the customer feel talking to the AI?)
+## Latency Analysis (how fast the AI can respond to queries?)
+Show average latency per endpont
+Show average latency per minute over time graph
+## Usage Rate (How much is the AI used compared to other services?)
+## Human-Sounding Rate (How much does AI sound like a human? We could provide examples of real responses from the AI for management to analyze)
+## Breach Analysis - Analyze cases of potential breaches in private information
+## Usage/Traffic Analysis - Note how often usage in the AI changes over time (graph)
+## API Usage for the AI - Analyzing the cost of the AI based on the model used
