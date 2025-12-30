@@ -6,6 +6,7 @@ from datetime import datetime
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
 supabase_url = os.getenv("SUPABASE_URL")
+print(supabase_url)
 key = os.getenv("SUPABASE_SERVICE_KEY")
 
 # Create a Supabase client with the url and service key

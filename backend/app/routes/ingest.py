@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
 from ..middleware.cache import ALLOWED_CACHE
-from analysis import calculate_latency
+from .analysis import calculate_latency
 
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
