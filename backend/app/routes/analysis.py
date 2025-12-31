@@ -6,7 +6,6 @@ from datetime import datetime, timedelta, timezone
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
 supabase_url = os.getenv("SUPABASE_URL")
-print(supabase_url)
 key = os.getenv("SUPABASE_SERVICE_KEY")
 
 # Create a Supabase client with the url and service key
@@ -38,7 +37,7 @@ def update_latency_rollup():
     if not response.data:
         print("No projects found for latency rollup update.")
         return
-    projects = response.data[0]["public_api_key"]
+    projects = [row["public_api_key"] for row in response.data]
 
     # We will update for each project that exists
     for project_api_key in projects:
@@ -48,15 +47,20 @@ def update_latency_rollup():
         # Set end_ts to the start of the previous minute for a one minute safety lag
         end_ts = now.replace(second=0, microsecond=0) - timedelta(minutes=1)
 
-        # Call supabase to get when the last rollup was done for the current project
-        last_rollup_response = supabase.table("projects").select("last_latency_rollup").eq("project_api_key", project_api_key).order("end_ts", desc=True).limit(1).execute()
+        # Just initializing
+        start_ts = end_ts
 
+        # Call supabase to get when the last rollup was done for the current project
+        last_rollup_response = supabase.table("projects").select("last_latency_rollup").eq("public_api_key", project_api_key).limit(1).execute()
         # If there was a previous rollup, set start_ts to that timestamp otherwise set it to one hour ago
-        if last_rollup_response.data and len(last_rollup_response.data) > 0:
+        if last_rollup_response.data[0]["last_latency_rollup"] and len(last_rollup_response.data) > 0:
             last_rollup_ts = last_rollup_response.data[0]["last_latency_rollup"]
             start_ts = last_rollup_ts
         else:
             start_ts = end_ts - timedelta(minutes=60)
+
+        # Convert start_ts to timestamptz
+        start_ts = datetime.fromisoformat(start_ts.replace("Z", "+00:00"))
 
         # Call the RPC function in Supabase to do the rollup
         supabase.rpc("run_latency_rollup", {

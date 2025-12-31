@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from app.routes.analysis import update_latency_rollup
+from ..routes.analysis import update_latency_rollup
 
 # Load .env.local by looking for the file one directory above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -59,7 +59,7 @@ async def refresh_loop():
 async def update_latency_rollup_loop():
     while True:
         try:
-            await update_latency_rollup()
+            update_latency_rollup()
         except Exception as e:
             print(f"Error updating latency rollup: {e}")
         await asyncio.sleep(60)
