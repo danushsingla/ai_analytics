@@ -61,3 +61,6 @@ Show average latency per minute over time graph
 ## Breach Analysis - Analyze cases of potential breaches in private information
 ## Usage/Traffic Analysis - Note how often usage in the AI changes over time (graph)
 ## API Usage for the AI - Analyzing the cost of the AI based on the model used
+
+# Features for later on
+Add parallel updating of latency_rollup and other tables in some shape or form

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from app.routes.analysis import update_latency_rollup
 
 # Load .env.local by looking for the file one directory above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -54,12 +55,23 @@ async def refresh_loop():
             print(f"Error refreshing projects: {e}")
         await asyncio.sleep(60)
 
+# Loop to update latency rollup every minute
+async def update_latency_rollup_loop():
+    while True:
+        try:
+            await update_latency_rollup()
+        except Exception as e:
+            print(f"Error updating latency rollup: {e}")
+        await asyncio.sleep(60)
+
 # To update the allowed origins periodically
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Start the refresh loop in the background
-    task = asyncio.create_task(refresh_loop())
+    task_allowed_origins = asyncio.create_task(refresh_loop())
+    task_latency_rollup = asyncio.create_task(update_latency_rollup_loop())
     try:
         yield
     finally:
-        task.cancel()
+        task_allowed_origins.cancel()
+        task_latency_rollup.cancel()
