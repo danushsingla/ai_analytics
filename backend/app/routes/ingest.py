@@ -277,3 +277,26 @@ async def remove_valid_url(payload: UpdateValidURLsRequest):
         valid_urls.remove(url)
         # Update the row in Supabase
         supabase.table("project_api_urls").update({"valid_api_urls": {"urls": valid_urls}}).eq("project_api_key", public_api_key).execute()
+
+@router.get("/getLatencyRollupData")
+async def get_latency_rollup_data(public_api_key: str, endpoint: str):
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab latency rollup data from Supabase
+    response = supabase.table("latency_rollups").select("*").eq("project_api_key", public_api_key).eq("endpoint", endpoint).execute()
+
+    if response.data:
+        # Only return relevant fields
+        latency_rollups = [{
+            "time": row["bucket_start"],
+            "average_latency_ms": row["avg_latency_ms"],
+            "count": row["count"],
+            "p95": row["p95"],
+            "p99": row["p99"]
+        } for row in response.data]
+
+        return {"latency_rollups": latency_rollups}
+    else:
+        return {"latency_rollups": []}
