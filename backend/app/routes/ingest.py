@@ -140,7 +140,7 @@ async def register_user(body: RegisterUserRequest):
     # If user does not exist, create a new entry with the email and the user ID
     supabase.table("users").insert({"email": email, "user_id": id}).execute()
 
-# Helper for /register_domain and /get_domains to grab all domains
+# Helper for /register_domain to grab all domains
 def get_domains_helper(user_id):
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
@@ -210,11 +210,21 @@ class DomainsRequest(BaseModel):
     user_id: str
 
 # When loading user dashboard, grab their domain allowlist from Supabase
-@router.post("/get_domains")
+@router.post("/get_projects_info")
 async def get_domains(payload: DomainsRequest):
     user_id = payload.user_id
-    domains, api_keys = get_domains_helper(user_id)
-    return {"domains": domains, "api_keys": api_keys}
+
+    # Gets the project name, domain, and api key for all projects for this user
+    response = supabase.table("projects").select("domain", "public_api_key", "project_name").eq("user_id", user_id).execute()
+
+    # Ensure there is a response
+    if not response.data:
+        return {"domains": [], "api_keys": []}
+    domains = [row["domain"] for row in response.data if row.get("domain")]
+    api_keys = [row["public_api_key"] for row in response.data if row.get("public_api_key")]
+    names = [row["project_name"] for row in response.data if row.get("project_name")]
+    
+    return {"domains": domains, "api_keys": api_keys, "names": names}
 
 # When loading user dashboard, grab all of their api urls from Supabase
 @router.get("/get_api_urls")
