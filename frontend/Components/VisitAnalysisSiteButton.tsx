@@ -1,36 +1,52 @@
+"use client"
+
 import { Button } from "@/Components/ui/button"
 import Link from "next/link"
-import { auth } from '@clerk/nextjs/server';
+import { useUser } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
 
 type VisitAnalysisSiteButtonProps = {
     publicApiKey: string;
 }
 
-export default async function VisitAnalysisSiteButton({
+export default function VisitAnalysisSiteButton({
     publicApiKey,
 }: VisitAnalysisSiteButtonProps) {
+
     // Grab userId for page redirect
-    const { userId } = await auth();
-    let href = "";
+    const { user, isLoaded, isSignedIn } = useUser();
 
-    if(!userId) {
-        alert("User not signed in.");
-        href = '/';
+    // Use router for navigation
+    const router = useRouter();
+
+    async function getUserId() {
+
+        if (!isLoaded || !isSignedIn || !user) {
+            alert("User not signed in.");
+            return '/';
+        }
+
+        const userId = user.id;
+
+        let href = "";
+
+        if(!userId) {
+            alert("User not signed in.");
+            href = '/';
+        }
+
+        if(!publicApiKey) {
+            alert("No public API key found for this domain.");
+            href= '/dashboard';
+        }
+
+        // Redirect to the link frontend/dashboard/userId/analysis/publicApiKey
+        router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/dashboard/${userId}/analysis/${publicApiKey}`);
     }
-
-    if(!publicApiKey) {
-        alert("No public API key found for this domain.");
-        href= '/dashboard';
-    }
-
-    // Redirect to the link frontend/dashboard/userId/analysis/publicApiKey
-    href = (`${process.env.NEXT_PUBLIC_FRONTEND_URL}/dashboard/${userId}/analysis/${publicApiKey}`);
 
   return (
-    <div>
-        <Button asChild variant="outline">
-            <Link href={href}>Visit Analysis Site</Link>
-        </Button>
-    </div>
+    <Button variant="outline" onClick={getUserId}>
+        Visit Analysis Site
+    </Button>
   )
 }

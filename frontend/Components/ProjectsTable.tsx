@@ -13,7 +13,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 import { Button } from "@/Components/ui/button"
 import { Checkbox } from "@/Components/ui/checkbox"
@@ -32,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/Components/ui/table"
+import VisitAnalysisSiteButton from "./VisitAnalysisSiteButton"
 
 export type Projects = {
   project_api_key: string
@@ -194,6 +195,12 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
                       )}
                     </TableCell>
                   ))}
+                  <TableCell>
+                    
+                  </TableCell>
+                  <TableCell>
+                    <VisitAnalysisSiteButton publicApiKey={row.original.project_api_key} />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (

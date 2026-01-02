@@ -36,7 +36,6 @@ export default async function RegisteredDomainsList() {
                 { domains.map((domain: string, index: number) => (
                     <li key={domain} className="mb-2">
                     <APIUrlList domain={domain} public_api_key={api_keys[index]} />
-                    <VisitAnalysisSiteButton publicApiKey={api_keys[index]}/>
                     </li>
                 ))}
             </ul>
