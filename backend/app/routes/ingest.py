@@ -284,19 +284,13 @@ async def get_latency_rollup_data(public_api_key: str, endpoint: str):
     if not verify_public_api_key(public_api_key):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
     
-    # Grab latency rollup data from Supabase
-    response = supabase.table("latency_rollups").select("*").eq("project_api_key", public_api_key).eq("endpoint", endpoint).execute()
+    # Grab latency rollup data from Supabase but only for the last 24 hours
+    response = supabase.rpc("get_latency_rollups", {
+        "p_project_api_key": public_api_key,
+        "p_endpoint": endpoint
+    }).execute()
 
     if response.data:
-        # Only return relevant fields
-        latency_rollups = [{
-            "time": row["bucket_start"],
-            "average_latency_ms": row["avg_latency_ms"],
-            "count": row["count"],
-            "p95": row["p95"],
-            "p99": row["p99"]
-        } for row in response.data]
-
-        return {"latency_rollups": latency_rollups}
+        return {"latency_rollups": response.data}
     else:
         return {"latency_rollups": []}

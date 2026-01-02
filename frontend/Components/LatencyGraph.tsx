@@ -1,6 +1,6 @@
 "use client"
 
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip } from "recharts"
 
 import {
   Card,
@@ -16,7 +16,32 @@ export const description = "A linear line chart"
 type LatencyPoint = {
     time: number
     average_latency_ms: number
+    p95: number
+    p99: number
+    count: number
   }
+
+function LatencyToolTip({ active, payload }: any) {
+    if(!active || !payload?.length) return null;
+
+    const p = payload[0].payload as LatencyPoint;
+
+    return (
+        <div className="rounded-md border bg-background p-2 text-sm shadow">
+            <div className="font-medium">
+                {new Date(p.time as number).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    })}
+            </div>
+            <div>Avg: {p.average_latency_ms} ms</div>
+            <div>P95: {p.p95} ms</div>
+            <div>P99: {p.p99} ms</div>
+            <div>Count: {p.count}</div>
+        </div>
+    )
+}
 
 export function LatencyGraph({project_api_key, endpoint}: {project_api_key: string, endpoint: string}) {
     const [data, setData] = useState<LatencyPoint[]>([])
@@ -34,10 +59,14 @@ export function LatencyGraph({project_api_key, endpoint}: {project_api_key: stri
             throw new Error(`Failed to fetch latency rollup data: ${text}`);
         }
         const data = await res.json();
+        console.log(data);
         const points: LatencyPoint[] = data.latency_rollups.map(
             (r: any) => ({
-                time: new Date(r.time).getTime(), // Converts ISO to ms
-                average_latency_ms: r.average_latency_ms,
+                time: new Date(r.bucket_start).getTime(), // Converts ISO to ms
+                average_latency_ms: r.avg_latency_ms,
+                p95: r.p95,
+                p99: r.p99,
+                count: r.count,
             })
         );
 
@@ -93,6 +122,7 @@ export function LatencyGraph({project_api_key, endpoint}: {project_api_key: stri
             strokeWidth={2}
             dot={false}
         />
+        <Tooltip content={<LatencyToolTip />} />
         </LineChart>
         </CardContent>
     </Card>
