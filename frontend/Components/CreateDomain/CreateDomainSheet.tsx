@@ -10,8 +10,7 @@ import {
   SheetDescription,
   SheetFooter,
   SheetHeader,
-  SheetTitle,
-  SheetTrigger,
+  SheetTitle
 } from "@/Components/ui/sheet"
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
@@ -25,6 +24,7 @@ export function CreateDomainSheet({
 }) {
   // Variable to store domain
   const [domain, setDomain] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Grab user
@@ -49,7 +49,7 @@ export function CreateDomainSheet({
           headers: {
               'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ user_id: userId, domain: domain }),
+          body: JSON.stringify({ user_id: userId, domain: domain, name: name }),
       });
 
       if (!res.ok) {
@@ -75,7 +75,11 @@ export function CreateDomainSheet({
         </SheetHeader>
         <div className="grid flex-1 auto-rows-min gap-6 px-4">
           <div className="grid gap-3">
-            <Label htmlFor="domain-urle">Website URL</Label>
+            <Label htmlFor="domain-name">Domain Name</Label>
+            <Input id="domain-name" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className="grid gap-3">
+            <Label htmlFor="domain-url">Website URL</Label>
             <Input id="domain-url" value={domain} onChange={(e) => setDomain(e.target.value)} />
           </div>
         </div>

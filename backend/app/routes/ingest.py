@@ -171,12 +171,14 @@ def get_domains_helper(user_id):
 class RegisterDomainRequest(BaseModel):
     user_id: str
     domain: str
+    name: str
 
 # When a user wishes to register a domain, add it to their allowlist in Supabase
 @router.post("/register_domain")
 async def register_domain(payload: RegisterDomainRequest):
     user_id = payload.user_id
     domain = payload.domain
+    name = payload.name
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
         raise HTTPException(status_code=400, detail="Invalid user_id")
@@ -195,7 +197,7 @@ async def register_domain(payload: RegisterDomainRequest):
         
         # Insert the new domain into the projects table, check if the api key meets a collision
         try:
-            supabase.table("projects").insert({"user_id": user_id, "domain": domain, "public_api_key": api_key, "public_api_key_enabled": True}).execute()
+            supabase.table("projects").insert({"user_id": user_id, "project_name": name,"domain": domain, "public_api_key": api_key, "public_api_key_enabled": True}).execute()
             break
         except Exception as e:
             continue
