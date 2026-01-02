@@ -33,6 +33,7 @@ import {
   TableRow,
 } from "@/Components/ui/table"
 import VisitAnalysisSiteButton from "./VisitAnalysisSiteButton"
+import VisitEndpointList from "./VisitEndpointList"
 
 export type Projects = {
   project_api_key: string

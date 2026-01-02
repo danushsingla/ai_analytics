@@ -1,7 +1,6 @@
 // Server Component
 import { auth } from '@clerk/nextjs/server';
-import APIUrlList from './APIUrlList';
-import VisitAnalysisSiteButton from './VisitAnalysisSiteButton';
+import APIUrlList from './VisitEndpointList';
 import ProjectsTable from './ProjectsTable';
 
 
