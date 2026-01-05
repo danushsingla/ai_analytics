@@ -41,9 +41,9 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-When dashboard refreshes, sometimes items move around which is weird
 Create alert if a domain isn't reachable rather than a nextjs error
-Create checks to prevent a domain and name duplicate
+Create checks to prevent a domain and name duplicate and to ensure that a project has a domain and name when created
+Move API Endpoints button into the table
 Create listening schema since grabbing api data can vary per call
 
 ## Huge Security Violations

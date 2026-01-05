@@ -28,13 +28,20 @@ export default async function RegisteredDomainsList() {
     const api_keys = Array.isArray(data?.api_keys) ? data.api_keys : [];
     const names = Array.isArray(data?.names) ? data.names : [];
 
+    const projects = domains.map((domain: string, index: number) => ({
+        domain,
+        name: names[index],
+        project_api_key: api_keys[index],
+    }));
+
+
     return (
         <div>
-            <ProjectsTable names={names} domains={domains} api_keys={api_keys} />
+            <ProjectsTable projects={projects} />
             <ul>
-                { domains.map((domain: string, index: number) => (
-                    <li key={domain} className="mb-2">
-                    <APIUrlList domain={domain} public_api_key={api_keys[index]} />
+                { projects.map((project: any) => (
+                    <li key={project.domain} className="mb-2">
+                    <APIUrlList domain={project.domain} public_api_key={project.project_api_key} />
                     </li>
                 ))}
             </ul>

@@ -84,7 +84,7 @@ export const columns: ColumnDef<Projects>[] = [
   }
 ]
 
-export default function ProjectsTable({domains, names, api_keys}: {domains: string[], names: string[], api_keys: string[]}) {
+export default function ProjectsTable({projects}: {projects: Projects[]}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -95,19 +95,15 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
 
   // Prepare data (Memoization only changes if any of the data changes to prevent re-renders)
   const data = React.useMemo<Projects[]>(
-    () =>
-      domains.map((domain, index) => ({
-        domain,
-        name: names[index],
-        project_api_key: api_keys[index],
-      })),
-    [domains, names, api_keys]
+    () => projects,
+    [projects]
   )
 
 
   const table = useReactTable({
     data,
     columns,
+    getRowId: (row) => row.project_api_key,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
