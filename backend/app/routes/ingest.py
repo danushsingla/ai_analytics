@@ -9,6 +9,7 @@ from pydantic import BaseModel, EmailStr
 from typing import List
 from ..middleware.cache import ALLOWED_CACHE
 from .analysis import calculate_latency
+from ..middleware.cache import refresh_allowed_origins_cache_from_supabase
 
 # Load .env.local by looking for the file two directories above
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../", ".env.local"))
@@ -28,7 +29,7 @@ def verify_public_api_key(public_api_key: str):
         raise HTTPException(status_code=400, detail="Invalid public_api_key")
     
     # Check the cache to see if the api key is enabled
-    if public_api_key in ALLOWED_CACHE and ALLOWED_CACHE[public_api_key]["public_api_key_enabled"]:
+    if public_api_key in ALLOWED_CACHE:
             return True
     return False
 
@@ -206,6 +207,8 @@ async def register_domain(payload: RegisterDomainRequest):
     # When a project is officially registered, I need to update the project_api_urls table to have an entry for this api key
     supabase.table("project_api_urls").insert({"project_api_key": api_key, "all_api_urls": {"urls": []}, "valid_api_urls": {"urls": []}}).execute()
     
+    # After the project is registered, refresh the allowed origins cache
+    refresh_allowed_origins_cache_from_supabase()
 
 class DomainsRequest(BaseModel):
     user_id: str

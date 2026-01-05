@@ -19,8 +19,6 @@ export function ConfirmDeleteProjects({
     open: boolean
     onOpenChange: (open: boolean) => void
 }) {
-    console.log(projects)
-
     async function deleteSelectedRows() {
         const apiKeysToDelete = projects.map(project => project.project_api_key)
 
