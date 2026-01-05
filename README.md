@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Create a table in the frontend showing a list of websites they have
 More testing must be done to ensure security of using an api key with the use of api urls selection
 Create listening schema since grabbing api data can vary per call
 
