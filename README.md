@@ -41,7 +41,8 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-More testing must be done to ensure security of using an api key with the use of api urls selection
+Add ability to delete a project in dashboard
+Create alert if a domain isn't reachable rather than a nextjs error
 Create listening schema since grabbing api data can vary per call
 
 ## Huge Security Violations

@@ -14,6 +14,7 @@ import {
 } from "@/Components/ui/sheet"
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
+import { CopyCard } from '@/Components/CopyCard';
 
 export function CreateDomainSheet({
   open,
@@ -26,6 +27,9 @@ export function CreateDomainSheet({
   const [domain, setDomain] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // CopyCard
+  const [openCopyCard, setOpenCopyCard] = useState(false);
 
   // Grab user
   const { user, isLoaded, isSignedIn } = useUser();
@@ -56,40 +60,50 @@ export function CreateDomainSheet({
           const text = await res.text();
           throw new Error(`Failed to register domain: ${text}`);
       }
+
+      onOpenChange(false);
+
+      // Open CopyCard after a slight delay to ensure the sheet has closed
+      setTimeout(() => {setOpenCopyCard(true)}, 50)
     } catch (error) {
       console.error('Error registering domain:', error);
     } finally {
       setLoading(false);
-      onOpenChange(false); // Close the sheet after registering
     }
+
+    // At this point everything is successful so we can open copy card here
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Add New Domain</SheetTitle>
-          <SheetDescription>
-            Add a new website domain to your account to start tracking analytics.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="grid flex-1 auto-rows-min gap-6 px-4">
-          <div className="grid gap-3">
-            <Label htmlFor="domain-name">Domain Name</Label>
-            <Input id="domain-name" value={name} onChange={(e) => setName(e.target.value)} />
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Add New Domain</SheetTitle>
+            <SheetDescription>
+              Add a new website domain to your account to start tracking analytics.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="grid flex-1 auto-rows-min gap-6 px-4">
+            <div className="grid gap-3">
+              <Label htmlFor="domain-name">Domain Name</Label>
+              <Input id="domain-name" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="domain-url">Website URL</Label>
+              <Input id="domain-url" value={domain} onChange={(e) => setDomain(e.target.value)} />
+            </div>
           </div>
-          <div className="grid gap-3">
-            <Label htmlFor="domain-url">Website URL</Label>
-            <Input id="domain-url" value={domain} onChange={(e) => setDomain(e.target.value)} />
-          </div>
-        </div>
-        <SheetFooter>
-          <Button type="submit" onClick={RegisterDomain} disabled={loading}>{loading ? "Adding..." : "Add"}</Button>
-          <SheetClose asChild>
-            <Button variant="outline">Close</Button>
-          </SheetClose>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          <SheetFooter>
+            <Button type="submit" onClick={RegisterDomain} disabled={loading}>{loading ? "Adding..." : "Add"}</Button>
+            <SheetClose asChild>
+              <Button variant="outline">Close</Button>
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      <CopyCard open={openCopyCard} onOpenChange={setOpenCopyCard} />
+    </>
   )
 }
