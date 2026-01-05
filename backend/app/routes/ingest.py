@@ -306,3 +306,25 @@ async def get_latency_rollup_data(public_api_key: str, endpoint: str):
         return {"latency_rollups": response.data}
     else:
         return {"latency_rollups": []}
+    
+# Based on the domain and name of the project, grab the api key from a specific user for CopyCard display
+@router.post("/get_project_copy_card")
+async def get_project_copy_card(payload: RegisterDomainRequest):
+    user_id = payload.user_id
+    domain = payload.domain
+    name = payload.name
+
+    # Ensure user_id is valid
+    if not user_id or user_id in ["undefined", "null"]:
+        raise HTTPException(status_code=400, detail="Invalid user_id")
+    
+    # Grab the response from Supabase for domains
+    response = supabase.table("projects").select("public_api_key").eq("user_id", user_id).eq("domain", domain).eq("project_name", name).limit(1).execute()
+
+    # Ensure there is a response
+    if not response.data or len(response.data) == 0:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    
+    api_key = response.data[0]["public_api_key"]
+    return {"public_api_key": api_key}

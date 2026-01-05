@@ -28,7 +28,7 @@ export function CreateDomainSheet({
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // CopyCard
+  // CopyCard (needs api key to call backend)
   const [openCopyCard, setOpenCopyCard] = useState(false);
 
   // Grab user
@@ -70,8 +70,6 @@ export function CreateDomainSheet({
     } finally {
       setLoading(false);
     }
-
-    // At this point everything is successful so we can open copy card here
   }
 
   return (
@@ -103,7 +101,7 @@ export function CreateDomainSheet({
         </SheetContent>
       </Sheet>
 
-      <CopyCard open={openCopyCard} onOpenChange={setOpenCopyCard} />
+      <CopyCard open={openCopyCard} onOpenChange={setOpenCopyCard} domain={domain} name={name}/>
     </>
   )
 }
