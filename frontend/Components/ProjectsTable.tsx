@@ -69,7 +69,7 @@ export const columns: ColumnDef<Projects>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("name")}</div>
+      <div className="">{row.getValue("name")}</div>
     ),
   },
   {
@@ -165,7 +165,7 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
+                      className=""
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
