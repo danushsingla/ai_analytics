@@ -6,6 +6,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
+from typing import List
 from ..middleware.cache import ALLOWED_CACHE
 from .analysis import calculate_latency
 
@@ -328,3 +329,33 @@ async def get_project_copy_card(payload: RegisterDomainRequest):
     
     api_key = response.data[0]["public_api_key"]
     return {"public_api_key": api_key}
+
+# Delete projects as grouped in an array
+class DeleteProjectRequest(BaseModel):
+    project_api_keys: List[str]
+
+@router.post("/delete_projects")
+async def delete_project(payload: DeleteProjectRequest):
+    project_api_keys = payload.project_api_keys
+
+    # If no keys provided, provide warning but no error (basically do nothing)
+    if not project_api_keys or len(project_api_keys) == 0:
+        return {"status": "no_keys_provided"}
+    
+    for project_api_key in project_api_keys:
+        # Ensure project_api_key is valid
+        if not verify_public_api_key(project_api_key):
+            raise HTTPException(status_code=403, detail="Invalid or disabled project_api_key")
+
+        # Delete the project from the projects table
+        supabase.table("projects").delete().eq("public_api_key", project_api_key).execute()
+
+        # Delete the project from the project_api_urls table
+        supabase.table("project_api_urls").delete().eq("project_api_key", project_api_key).execute()
+
+        # Delete the project from the events, latency_events, and Latency_rollups tables
+        supabase.table("events").delete().eq("project_api_key", project_api_key).execute()
+        supabase.table("latency_events").delete().eq("project_api_key", project_api_key).execute()
+        supabase.table("latency_rollups").delete().eq("project_api_key", project_api_key).execute()
+
+    return {"status": "deleted"}

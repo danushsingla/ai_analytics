@@ -33,7 +33,7 @@ import {
   TableRow,
 } from "@/Components/ui/table"
 import VisitAnalysisSiteButton from "./VisitAnalysisSiteButton"
-import VisitEndpointList from "./VisitEndpointList"
+import { useEffect } from "react"
 
 export type Projects = {
   project_api_key: string
@@ -123,6 +123,32 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
     },
   })
 
+  // Keep track of selected rows
+  const [selectedRows, setSelectedRows] = React.useState<any[]>([])
+
+  useEffect(() => {
+    // To get an item do selectedRows[i].original then .API key or .name etc.
+    setSelectedRows(table.getSelectedRowModel().rows)
+  }, [table.getSelectedRowModel().rows])
+
+  async function deleteSelectedRows() {
+    const apiKeysToDelete = selectedRows.map(row => row.original.project_api_key)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/delete_projects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ project_api_keys: apiKeysToDelete }),
+      })
+    } catch (error) {
+      console.error("Error deleting projects:", error)
+    }
+    // Refresh the page to reflect deletions
+    window.location.reload()
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -134,6 +160,7 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
           }
           className="max-w-sm"
         />
+        <Button variant="secondary" className="ml-5" onClick={deleteSelectedRows}>Delete Selected Rows</Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
