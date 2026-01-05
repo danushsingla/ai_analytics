@@ -34,6 +34,7 @@ import {
 } from "@/Components/ui/table"
 import VisitAnalysisSiteButton from "./VisitAnalysisSiteButton"
 import { useEffect } from "react"
+import { ConfirmDeleteProjects } from "./ConfirmDeleteProjects"
 
 export type Projects = {
   project_api_key: string
@@ -126,148 +127,140 @@ export default function ProjectsTable({domains, names, api_keys}: {domains: stri
   // Keep track of selected rows
   const [selectedRows, setSelectedRows] = React.useState<any[]>([])
 
+  // Keep track of delete project window
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+
   useEffect(() => {
     // To get an item do selectedRows[i].original then .API key or .name etc.
-    setSelectedRows(table.getSelectedRowModel().rows)
+    setSelectedRows(table.getSelectedRowModel().rows.map(row => row.original))
   }, [table.getSelectedRowModel().rows])
 
-  async function deleteSelectedRows() {
-    const apiKeysToDelete = selectedRows.map(row => row.original.project_api_key)
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/delete_projects`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ project_api_keys: apiKeysToDelete }),
-      })
-    } catch (error) {
-      console.error("Error deleting projects:", error)
-    }
-    // Refresh the page to reflect deletions
-    window.location.reload()
-  }
+  // Simple function to check if there are any selected to then enable/disable delete button
+  const hasSelectedRows = Object.keys(rowSelection).length > 0;
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter names..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Button variant="secondary" className="ml-5" onClick={deleteSelectedRows}>Delete Selected Rows</Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+    <>
+      <div className="w-full">
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter names..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <Button variant="secondary" className="ml-5" onClick={() => setIsDeleteDialogOpen(true)} disabled={!hasSelectedRows}>Delete Selected Rows</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
                   return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
                   )
                 })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      
                     </TableCell>
-                  ))}
-                  <TableCell>
-                    
-                  </TableCell>
-                  <TableCell>
-                    <VisitAnalysisSiteButton publicApiKey={row.original.project_api_key} />
+                    <TableCell>
+                      <VisitAnalysisSiteButton publicApiKey={row.original.project_api_key} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="text-muted-foreground flex-1 text-sm">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <ConfirmDeleteProjects open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} projects={selectedRows} />
+    </>
   )
 }

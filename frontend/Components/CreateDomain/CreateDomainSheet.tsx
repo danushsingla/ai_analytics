@@ -72,6 +72,14 @@ export function CreateDomainSheet({
     }
   }
 
+  // Refreshes the page once the copy card is closed
+  function handleCopyCardOpenChange(open: boolean) {
+    setOpenCopyCard(open);
+    if (!open) {
+      window.location.reload();
+    }
+  }
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -101,7 +109,7 @@ export function CreateDomainSheet({
         </SheetContent>
       </Sheet>
 
-      <CopyCard open={openCopyCard} onOpenChange={setOpenCopyCard} domain={domain} name={name}/>
+      <CopyCard open={openCopyCard} onOpenChange={handleCopyCardOpenChange} domain={domain} name={name}/>
     </>
   )
 }
