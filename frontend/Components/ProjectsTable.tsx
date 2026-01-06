@@ -33,6 +33,7 @@ import {
   TableRow,
 } from "@/Components/ui/table"
 import VisitAnalysisSiteButton from "./VisitAnalysisSiteButton"
+import VisitEndpointList from "./VisitEndpointList"
 import { useEffect } from "react"
 import { ConfirmDeleteProjects } from "./ConfirmDeleteProjects"
 
@@ -214,6 +215,9 @@ export default function ProjectsTable({projects}: {projects: Projects[]}) {
                     </TableCell>
                     <TableCell>
                       <VisitAnalysisSiteButton publicApiKey={row.original.project_api_key} />
+                    </TableCell>
+                    <TableCell>
+                      <VisitEndpointList domain={row.original.domain} public_api_key={row.original.project_api_key} />
                     </TableCell>
                   </TableRow>
                 ))

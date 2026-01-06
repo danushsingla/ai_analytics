@@ -38,13 +38,6 @@ export default async function RegisteredDomainsList() {
     return (
         <div>
             <ProjectsTable projects={projects} />
-            <ul>
-                { projects.map((project: any) => (
-                    <li key={project.project_api_key} className="mb-2">
-                    <APIUrlList domain={project.domain} public_api_key={project.project_api_key} />
-                    </li>
-                ))}
-            </ul>
         </div>
     )
 }

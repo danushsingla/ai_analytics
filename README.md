@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-If a domain fails to get created once, clicking the button just lets it go anyways
 Move API Endpoints button into the table
 Create listening schema since grabbing api data can vary per call
 

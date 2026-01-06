@@ -52,7 +52,7 @@ export default function VisitEndpointList({ domain, public_api_key }: { domain: 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button variant="outline">View API Endpoints for {domain}</Button>
+                <Button variant="outline">View API Endpoints</Button>
             </DrawerTrigger>
         <DrawerContent className="flex flex-col h-[80vh] w-full">
             <DrawerHeader>
