@@ -40,7 +40,7 @@ export default async function RegisteredDomainsList() {
             <ProjectsTable projects={projects} />
             <ul>
                 { projects.map((project: any) => (
-                    <li key={project.domain} className="mb-2">
+                    <li key={project.project_api_key} className="mb-2">
                     <APIUrlList domain={project.domain} public_api_key={project.project_api_key} />
                     </li>
                 ))}

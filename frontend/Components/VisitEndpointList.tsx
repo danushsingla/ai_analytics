@@ -40,7 +40,6 @@ export default function VisitEndpointList({ domain, public_api_key }: { domain: 
                 }
 
                 const data = await res.json();
-                console.log(data)
                 setAllAPIUrls(data.all_urls || []);
             } catch (error) {
                 console.error('Error fetching API URLs:', error);

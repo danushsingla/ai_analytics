@@ -15,6 +15,7 @@ import {
 import { useUser } from "@clerk/nextjs"
 import { useState } from "react"
 import { CopyCard } from '@/Components/CopyCard';
+import { toast } from "sonner";
 
 export function CreateDomainSheet({
   open,
@@ -44,6 +45,11 @@ export function CreateDomainSheet({
 
   // When Add is clicked, I need to call the backend /register_domain endpoint to register the domain
   async function RegisterDomain() {
+    // Ensure both fields are filled
+    if (domain.trim() === "" || name.trim() === "") {
+      toast("Please fill in both the domain name and website URL.");
+      return;
+    }
     // Set loading to prevent multiple requests at once
     setLoading(true);
 
@@ -58,7 +64,14 @@ export function CreateDomainSheet({
 
       if (!res.ok) {
           const text = await res.text();
-          throw new Error(`Failed to register domain: ${text}`);
+          toast.error(`Failed to register domain`);
+      }
+
+      const data = await res.json();
+
+      if (data.status === "exists") {
+        toast.error("This domain and name combination is already registered.");
+        return;
       }
 
       onOpenChange(false);

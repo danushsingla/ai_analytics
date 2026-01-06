@@ -41,8 +41,7 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Create alert if a domain isn't reachable rather than a nextjs error
-Create checks to prevent a domain and name duplicate and to ensure that a project has a domain and name when created
+If a domain fails to get created once, clicking the button just lets it go anyways
 Move API Endpoints button into the table
 Create listening schema since grabbing api data can vary per call
 

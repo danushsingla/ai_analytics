@@ -11,6 +11,7 @@ import {
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import RegisterUserOnSignIn from '../Components/RegisterUserOnSignIn'
+import { Toaster } from '@/Components/ui/sonner'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -55,6 +56,7 @@ export default function RootLayout({
             </SignedIn>
           </header>
           {children}
+          <Toaster position="bottom-left" />
         </body>
       </html>
     </ClerkProvider>

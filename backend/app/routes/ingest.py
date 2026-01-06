@@ -146,29 +146,19 @@ async def register_user(body: RegisterUserRequest):
 def get_domains_helper(user_id):
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
-        return {"domains": [], "api_keys": []}
+        return {"domains": [], "names": []}
     
     # Grab the response from Supabase for domains
-    response_domains = supabase.table("projects").select("domain").eq("user_id", user_id).execute()
-
-    # Ensure there is a response
-    if not response_domains.data:
-        return {"domains": [], "api_keys": []}
-    
-    # Grab each domain from each row
-    domains = [row["domain"] for row in response_domains.data if row.get("domain")]
-
-    # Grab the response from Supabase for api keys
-    response = supabase.table("projects").select("public_api_key").eq("user_id", user_id).execute()
+    response = supabase.table("projects").select("domain", "project_name").eq("user_id", user_id).execute()
 
     # Ensure there is a response
     if not response.data:
-        return {"domains": domains, "api_keys": []}
-    
-    # Grab each api key from each row
-    api_keys = [row["public_api_key"] for row in response.data if row.get("public_api_key")]
+        return {"domains": [], "names": []}
 
-    return domains, api_keys
+    # Grab each domain from each row
+    domains, names = [row["domain"] for row in response.data if row.get("domain")], [row["project_name"] for row in response.data if row.get("project_name")]
+
+    return {"domains": domains, "names": names}
 
 class RegisterDomainRequest(BaseModel):
     user_id: str
@@ -181,15 +171,16 @@ async def register_domain(payload: RegisterDomainRequest):
     user_id = payload.user_id
     domain = payload.domain
     name = payload.name
+
     # Ensure user_id is valid
     if not user_id or user_id in ["undefined", "null"]:
         raise HTTPException(status_code=400, detail="Invalid user_id")
     
     # Grab the existing domains from Supabase if it exists
-    domains, api_keys = get_domains_helper(user_id)
+    domains_names = get_domains_helper(user_id)
 
-    # If the domain is already in the list, do nothing
-    if domain in domains:
+    # If the domain-name pair already exists, return exists
+    if (domain, name) in zip(domains_names["domains"], domains_names["names"]):
         return {"status": "exists"}
     
     # Do a while true loop to avoid api key collisions
@@ -209,6 +200,8 @@ async def register_domain(payload: RegisterDomainRequest):
     
     # After the project is registered, refresh the allowed origins cache
     refresh_allowed_origins_cache_from_supabase()
+
+    return {"status": "registered"}
 
 class DomainsRequest(BaseModel):
     user_id: str
