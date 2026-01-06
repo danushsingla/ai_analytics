@@ -15,7 +15,7 @@ There are three main triggers GTM provides on default. One can chose between all
 Only one used because it loads initially when a page is loaded in and only loads in then. After the script loads, it thereafter searches for triggers (whenever an api call happens, can be specified in the script itself). Doing this prevents duplicate triggers (running more than once for an api call, needlessly filling data tables).
 
 #### Consent Initialization (Not used)
-Used for setting any consent defaults for a user, and updates whenever those consents change. This is not used because it can run the script more than once whenever some consents are changed, duplicating or complicating triggers unnecessarily. The issue with running this script more than once is that it can wrap onto itself, making a call happen more than once depending on the number of wraps that occured.
+Used for setting any consent defaults for a user, and updates whenever those consents change. This is not used because it can run the script more than once whenever some consents are changed, duplicating or complicating triggers unnecessarily. The issue with running this script more than once is that it can wrap onto itself, making a call happen more than once depending on the # of wraps that occured.
 
 #### Page View (Not used)
 Like Consent Initiailization, runs the risk of running more than once after the page initially loads whenever something is viewed further in the page (such as when you are on /skills and then click on the webpage to go into /skills/python, this can run twice for both causing a double wrap).
@@ -37,7 +37,7 @@ This is what is in the actual GTM which reads from the /gtmtracker endpoint
 </script>
 ```
 
-Something to note for the tracker script: If you want to run the script directly into GTM you must add `<script></script>` at the beginning and end of the GTM tracker script. Right now, that isn't there.
+Something to note for the tracker script: If you want to run the script directly into GTM you must add `<script></script>` at the beginning and end of the GTM tracker script. Right now, that is not there.
 
 
 # To Do
