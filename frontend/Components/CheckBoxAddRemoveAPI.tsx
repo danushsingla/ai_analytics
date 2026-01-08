@@ -2,6 +2,7 @@
 
 import { Checkbox } from "@/Components/ui/checkbox"
 import { useState, useEffect } from "react";
+import SchemaButton from "@/Components/SchemaButton";
 
 export default function CheckBoxAddRemoveAPI({public_api_key, url}: {public_api_key?: string; url?: string}) {
     const [checked, setChecked] = useState(false);
@@ -52,6 +53,7 @@ export default function CheckBoxAddRemoveAPI({public_api_key, url}: {public_api_
         <Checkbox checked={checked} onCheckedChange={(value) => {
             toggle(!!value);
         }} />
+        <SchemaButton checked={checked} public_api_key={public_api_key} url={url} />
     </div>
   )
 }

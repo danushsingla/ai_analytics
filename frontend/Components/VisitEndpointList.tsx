@@ -69,8 +69,9 @@ export default function VisitEndpointList({ domain, public_api_key }: { domain: 
                         <li>No API URLs found.</li>
                     ) : (
                         allAPIUrls.map((url: any) => 
-                        <li key={url} className="mb-1 flex gap-3">{url}
+                        <li key={url} className="mb-1 flex gap-3">
                         <CheckBoxAddRemoveAPI public_api_key={public_api_key} url={url} />
+                        {url}
                         </li>)
                     )}
                 </ul>

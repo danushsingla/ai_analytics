@@ -33,6 +33,14 @@ def verify_public_api_key(public_api_key: str):
             return True
     return False
 
+# Helper to get extracted text from body/url based on schema stored in supabase
+def get_text(public_api_key: str, url: str, body: str, alias: str):
+    # Get schema from Supabase
+    response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
+
+    # Get the message paths for this alias and endpint
+
+
 # Whenever someone writes POST to /collect then this happens
 @router.post("/collect")
 # Parses the JSON body and turns it into a Python dictionary
@@ -43,6 +51,9 @@ async def collect_event(event: dict, public_api_key: str):
     
     # Add the public_api_key to the event data
     event["project_api_key"] = public_api_key
+
+    # Since schema may be different, get the extracted text and store it in event
+    event["payload"]["extracted_text"] = get_text(public_api_key, event.get("payload")["url"], event.get("payload")["body"], event.get("event_type"))
     
     # Insert the event data
     response = supabase.table("events").insert(event).execute()
@@ -355,3 +366,49 @@ async def delete_project(payload: DeleteProjectRequest):
         supabase.table("latency_rollups").delete().eq("project_api_key", project_api_key).execute()
 
     return {"status": "deleted"}
+
+# Get the schema for a specific public_api_key and url
+@router.post("/get_schema")
+async def get_schema(public_api_key: str, url: str):
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab the response from Supabase
+    response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
+
+    # Initialize empty paths
+    user_request = ""
+    ai_response = ""
+
+    # Return the schema if it exists (first will be user and second will be ai always)
+    if response.data and response.data[0]["message_paths"]:
+        if response.data[0]["message_paths"].get(url):
+            user_request = response.data[0]["message_paths"].get(url)[0]
+            ai_response = response.data[0]["message_paths"].get(url)[1]
+        
+        return {"user_request": user_request, "ai_response": ai_response}
+    else:
+        return {"user_request": "", "ai_response": ""}
+
+# Set the message paths for a particular endpoint of a project
+@router.post("/set_schema")
+async def set_schema(public_api_key: str, url: str, user_request_path: str, ai_response_path: str):
+    # Ensure project_id is valid
+    if not verify_public_api_key(public_api_key):
+        raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+    
+    # Grab the existing message paths from Supabase
+    response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
+
+    message_paths = {}
+    if response.data and response.data[0]["message_paths"]:
+        message_paths = response.data[0]["message_paths"]
+    
+    # Update the message paths for this url
+    message_paths[url] = [user_request_path, ai_response_path]
+
+    # Update the row in Supabase
+    supabase.table("project_api_urls").update({"message_paths": message_paths}).eq("project_api_key", public_api_key).execute()
+
+    return {"status": "updated"}
