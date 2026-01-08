@@ -41,7 +41,6 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Move API Endpoints button into the table
 Create listening schema since grabbing api data can vary per call
 
 ## Huge Security Violations
