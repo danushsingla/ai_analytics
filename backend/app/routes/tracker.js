@@ -87,10 +87,16 @@
     var options = arguments[1] || {};
     var method = options.method ? options.method : "GET";
 
-    console.log(options);
-
     // Add a request ID to track requests/responses together
     var requestId = makeRequestId();
+    
+    // Get request body if there is one
+    var requestBody = null;
+    try {
+      if (options.body) {
+        requestBody = String(options.body).slice(0,5000) // Consolidating it to 5000 chars
+      }
+    } catch (e) {}
 
     // Track request
     try{
@@ -108,7 +114,7 @@
             payload: {
               url: url,
               method: method,
-              body: options,
+              body: requestBody,
               timestamp: Date.now()
             }
           }),
@@ -124,14 +130,15 @@
       
       // Clone response so we can read its body response safely (we don't interfere with the services of the app)
       var cloned;
+      var bodyText = null;
       
       // First try getting the cloned response
       try { cloned = response.clone(); } catch (e) {}
-
-      console.log(cloned);
       
       // Now try reading the body text returned
-      return (cloned).then(function (response) {
+      return (cloned ? cloned.text() : Promise.resolve(null)).then(function (text) {
+        bodyText = text;
+        
         // Send it all through
         try {
           // Track response WITH DATA
@@ -148,7 +155,7 @@
                 payload: {
                   url: url,
                   status: response.status,
-                  body: response,
+                  body: bodyText ? String(bodyText).slice(0,5000) : null, // Consolidating it to 5000 chars
                   timestamp: Date.now()
                 }
               }),
