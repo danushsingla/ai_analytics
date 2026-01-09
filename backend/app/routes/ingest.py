@@ -44,6 +44,7 @@ def parse_by_path(path: str, body: dict):
             # For when this is a dictionary
             body = body.get(key) if isinstance(body, dict) else None
             print("After dict access, body is:", body)
+            print(key, index)
             # For when this is a list
             index = int(index)
             body = body[index] if isinstance(body, list) and index < len(body) else None
@@ -63,7 +64,7 @@ def parse_by_path(path: str, body: dict):
 # Helper to get extracted text from body/url based on schema stored in supabase
 def get_text(public_api_key: str, url: str, body: str, alias: str):
     print("Getting text for alias:", alias)
-    
+
     # Get schema from Supabase
     response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
 
