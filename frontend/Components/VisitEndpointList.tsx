@@ -13,6 +13,8 @@ import {
 } from "@/Components/ui/drawer"
 import CheckBoxAddRemoveAPI from '@/Components/CheckBoxAddRemoveAPI';
 import { ScrollArea } from "@/Components/ui/scroll-area"
+import TruncateText from "@/Components/TruncateText";
+import { Separator } from "@/Components/ui/separator"
 
 export default function VisitEndpointList({ domain, public_api_key }: { domain: string; public_api_key: string }) {
     const [open, setOpen] = React.useState(false);
@@ -62,17 +64,18 @@ export default function VisitEndpointList({ domain, public_api_key }: { domain: 
                 </DrawerDescription>
             </DrawerHeader>
 
-            <ScrollArea className="flex-1 px-4">
+            <ScrollArea className="h-[60vh] w-[210vh] rounded-md border">
                 <h3 className="text-xl font-semibold mb-2">API Endpoints</h3>
                 <ul className="mb-4">
                     {allAPIUrls.length === 0 ? (
                         <li>No API URLs found.</li>
                     ) : (
                         allAPIUrls.map((url: any) => 
-                        <li key={url} className="mb-1 flex gap-3">
-                        <CheckBoxAddRemoveAPI public_api_key={public_api_key} url={url} />
-                        {url}
-                        </li>)
+                        <React.Fragment key={url}>
+                            <CheckBoxAddRemoveAPI public_api_key={public_api_key} url={url} />
+                            <TruncateText text={url} />
+                            <Separator className="my-2" />
+                        </React.Fragment>)
                     )}
                 </ul>
             </ScrollArea>

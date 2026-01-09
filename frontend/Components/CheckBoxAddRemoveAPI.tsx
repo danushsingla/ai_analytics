@@ -49,7 +49,7 @@ export default function CheckBoxAddRemoveAPI({public_api_key, url}: {public_api_
     }
 
   return (
-    <div>
+    <div className="flex items-center gap-2">
         <Checkbox checked={checked} onCheckedChange={(value) => {
             toggle(!!value);
         }} />
