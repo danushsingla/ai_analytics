@@ -36,10 +36,7 @@ def verify_public_api_key(public_api_key: str):
 
 # Helper to get data based on path and body
 def parse_by_path(path: str, body: dict):
-    print("Parsing by path:", path)
     for part in path.replace("]", "").split("."):
-        print("Current part:", part)
-        print("Current body:", body)
         if "[" in part:
             key, index = part.split("[")
             # For when this is a dictionary
@@ -50,18 +47,14 @@ def parse_by_path(path: str, body: dict):
         else:
             # For when this is a regular . access
             body = body.get(part) if isinstance(body, dict) else None
-            print("After dict access, body is:", body)
         if body is None:
-            print("Body is None, returning None")
             return None
         
-    print("Final extracted body:", body)
     return body
 
 
 # Helper to get extracted text from body/url based on schema stored in supabase
 def get_text(public_api_key: str, url: str, body: str, alias: str):
-    print("Getting text for alias:", alias)
 
     # Get schema from Supabase
     response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
@@ -72,10 +65,8 @@ def get_text(public_api_key: str, url: str, body: str, alias: str):
 
     # Depending on whether this is an ai_response or user_request, extract the text accordingly (parse body as json to convert from string to dict)
     if alias == "ai_response" and ai:
-        print("In AI response path")
         return parse_by_path(ai, json.loads(body))
     elif alias == "ai_request" and user:
-        print("In User request path")
         return parse_by_path(user, json.loads(body))
     else:
         return None
