@@ -1,5 +1,6 @@
 import os
 import secrets
+import json
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from supabase import create_client, Client
@@ -43,12 +44,9 @@ def parse_by_path(path: str, body: dict):
             key, index = part.split("[")
             # For when this is a dictionary
             body = body.get(key) if isinstance(body, dict) else None
-            print("After dict access, body is:", body)
-            print(key, index)
             # For when this is a list
             index = int(index)
             body = body[index] if isinstance(body, list) and index < len(body) else None
-            print("After list access, body is:", body)
         else:
             # For when this is a regular . access
             body = body.get(part) if isinstance(body, dict) else None
@@ -72,13 +70,13 @@ def get_text(public_api_key: str, url: str, body: str, alias: str):
     ai = response.data[0]["message_paths"].get(url)[1] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
     user = response.data[0]["message_paths"].get(url)[0] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
 
-    # Depending on whether this is an ai_response or user_request, extract the text accordingly
+    # Depending on whether this is an ai_response or user_request, extract the text accordingly (parse body as json to convert from string to dict)
     if alias == "ai_response" and ai:
         print("In AI response path")
-        return parse_by_path(ai, body)
+        return parse_by_path(ai, json.loads(body))
     elif alias == "ai_request" and user:
         print("In User request path")
-        return parse_by_path(user, body)
+        return parse_by_path(user, json.loads(body))
     else:
         return None
 
