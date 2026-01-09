@@ -76,7 +76,7 @@ def get_text(public_api_key: str, url: str, body: str, alias: str):
     if alias == "ai_response" and ai:
         print("In AI response path")
         return parse_by_path(ai, body)
-    elif alias == "user_request" and user:
+    elif alias == "ai_request" and user:
         print("In User request path")
         return parse_by_path(user, body)
     else:
