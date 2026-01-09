@@ -39,6 +39,14 @@ def get_text(public_api_key: str, url: str, body: str, alias: str):
     response = supabase.table("project_api_urls").select("message_paths").eq("project_api_key", public_api_key).execute()
 
     # Get the message paths for this alias and endpint
+    ai = response.data[0]["message_paths"].get(url)[1] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
+    user = response.data[0]["message_paths"].get(url)[0] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
+    print("AI PATH:", ai)
+    print("USER PATH:", user)
+    print("BODY:", body)
+    # Depending on whether this is an ai_response or user_request, extract the text accordingly
+    # if alias == "ai_response" and ai:
+    # elif alias == "user_request" and user:
 
 
 # Whenever someone writes POST to /collect then this happens
