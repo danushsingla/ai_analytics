@@ -33,6 +33,25 @@ def verify_public_api_key(public_api_key: str):
             return True
     return False
 
+# Helper to get data based on path and body
+def parse_by_path(path: str, body: dict):
+    for part in path.replace("]", "").split("."):
+        if "[" in part:
+            key, index = part.split("[")
+            # For when this is a dictionary
+            body = body.get(key) if isinstance(body, dict) else None
+            # For when this is a list
+            index = int(index)
+            body = body[index] if isinstance(body, list) and index < len(body) else None
+        else:
+            # For when this is a regular . access
+            body = body.get(part) if isinstance(body, dict) else None
+        
+        if body is None:
+            return None
+    return body
+
+
 # Helper to get extracted text from body/url based on schema stored in supabase
 def get_text(public_api_key: str, url: str, body: str, alias: str):
     # Get schema from Supabase
@@ -41,12 +60,14 @@ def get_text(public_api_key: str, url: str, body: str, alias: str):
     # Get the message paths for this alias and endpint
     ai = response.data[0]["message_paths"].get(url)[1] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
     user = response.data[0]["message_paths"].get(url)[0] if response.data and response.data[0]["message_paths"] and response.data[0]["message_paths"].get(url) else ""
-    print("AI PATH:", ai)
-    print("USER PATH:", user)
-    print("BODY:", body)
+
     # Depending on whether this is an ai_response or user_request, extract the text accordingly
-    # if alias == "ai_response" and ai:
-    # elif alias == "user_request" and user:
+    if alias == "ai_response" and ai:
+        return parse_by_path(ai, body)
+    elif alias == "user_request" and user:
+        return parse_by_path(user, body)
+    else:
+        return None
 
 
 # Whenever someone writes POST to /collect then this happens
