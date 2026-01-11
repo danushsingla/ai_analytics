@@ -41,7 +41,7 @@ Something to note for the tracker script: If you want to run the script directly
 
 
 # To Do
-Create listening schema since grabbing api data can vary per call
+Fix latency recordings by putting the latency recorder inside of tracker.js rather than Supabase since Supabase include db time changes
 
 ## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forget this due to the ease of development.
