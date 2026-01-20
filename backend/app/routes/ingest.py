@@ -451,11 +451,14 @@ async def log_chat_duration(event: dict, public_api_key: str):
     # Ensure project_id is valid
     if not verify_public_api_key(public_api_key):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
+
+    if "chat_window_duration" not in event["payload"] or "frontend_id" not in event["payload"]:
+        raise HTTPException(status_code=422, detail="payload must include chat_window_duration and frontend_id")
     
     # Insert the chat duration event into Supabase
     supabase.table("chat_durations").insert({
         "project_api_key": public_api_key,
-        "chat_window_duration": event["chat_window_duration"],
-        "frontend_id": event["frontend_id"]
+        "chat_window_duration": event["payload"]["chat_window_duration"],
+        "frontend_id": event["payload"]["frontend_id"]
     }).execute()
     return {"status": "logged"}
