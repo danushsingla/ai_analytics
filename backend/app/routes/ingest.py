@@ -446,14 +446,15 @@ async def set_schema(public_api_key: str, url: str, user_request_path: str, ai_r
 
 # When a chat window is closed on the frontend side, log the total time spent
 @router.post("/log_chat_duration")
-async def log_chat_duration(event: dict):
+async def log_chat_duration(event: dict, public_api_key: str):
+    print(event)
     # Ensure project_id is valid
-    if not verify_public_api_key(event["public_api_key"]):
+    if not verify_public_api_key(public_api_key):
         raise HTTPException(status_code=403, detail="Invalid or disabled public_api_key")
     
     # Insert the chat duration event into Supabase
     supabase.table("chat_durations").insert({
-        "project_api_key": event["public_api_key"],
+        "project_api_key": public_api_key,
         "chat_window_duration": event["chat_window_duration"],
         "frontend_id": event["frontend_id"]
     }).execute()

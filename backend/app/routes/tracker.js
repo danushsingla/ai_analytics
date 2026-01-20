@@ -95,7 +95,7 @@
     // Send chatDuration with id to backend
     try {
       originalFetch(
-        "https://ai-analytics-7tka.onrender.com/log_chat_duration",
+        "https://ai-analytics-7tka.onrender.com/log_chat_duration?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY),
         {
           method: "POST",
           credentials: "omit",
@@ -103,7 +103,6 @@
           keepalive: true,
           body: JSON.stringify({
             payload: {
-              public_api_key: PUBLIC_API_KEY,
               chat_window_duration: chatDuration,
               frontend_id: FRONTEND_ID
             }
