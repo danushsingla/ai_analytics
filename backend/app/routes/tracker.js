@@ -29,6 +29,57 @@
   // Store all urls ever fetched here
   var allUrls = [];
 
+  // Grab the frontend id if it exists to track frontend analytics
+  var FRONTEND_ID = "aianalytics-chat-panel"
+
+  // We will track if the panel is open or not by seeing if we can view it in the DOM
+  var wasOpen = false;
+
+  // Keep a global variable for when the chat window is opened
+  var chatStarted = 0;
+
+  function checkChatOpen() {
+    var isOpen = document.getElementById(FRONTEND_ID) !== null;
+
+    if (isOpen && !wasOpen) {
+      wasOpen = true;
+
+      // Set chat start time
+      chatStarted = Date.now();
+    }
+    else if (!isOpen && wasOpen) {
+      wasOpen = false;
+      
+      // Track chat closed event
+      var chatDuration = Date.now() - chatStarted;
+
+      // Send chatDuration with id to backend
+      try {
+        originalFetch(
+          "https://ai-analytics-7tka.onrender.com/log_chat_duration",
+          {
+            method: "POST",
+            credentials: "omit",
+            mode: "cors",
+            keepalive: true,
+            body: JSON.stringify({
+              payload: {
+                public_api_key: PUBLIC_API_KEY,
+                chat_window_duration: chatDuration,
+                frontend_id: FRONTEND_ID
+              }
+            }),
+            headers: { "Content-Type": "application/json" }
+          }
+        );
+      } catch(e) {}
+
+      // Reset chat started time
+      chatStarted = 0;
+    }
+  }
+
+
   // Call endpoint /config to get valid and all urls for this project
   originalFetch("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY))
     .then(function (response) {
