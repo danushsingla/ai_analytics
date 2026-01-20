@@ -78,7 +78,41 @@
       chatStarted = 0;
     }
   }
+  
+  // Run checkChatOpen in case window is already open to acknowledge it
+  checkChatOpen();
 
+  // Poll at some rate
+  var CHAT_POLL_RATE_MS = 250;
+  setInterval(checkChatOpen, CHAT_POLL_RATE_MS);
+
+  // If user closes tab while open then send that too
+  window.addEventListener("beforeunload", function () {
+    if (!wasOpen || !chatStarted) return;
+
+    var chatDuration = Date.now() - chatStarted;
+
+    // Send chatDuration with id to backend
+    try {
+      originalFetch(
+        "https://ai-analytics-7tka.onrender.com/log_chat_duration",
+        {
+          method: "POST",
+          credentials: "omit",
+          mode: "cors",
+          keepalive: true,
+          body: JSON.stringify({
+            payload: {
+              public_api_key: PUBLIC_API_KEY,
+              chat_window_duration: chatDuration,
+              frontend_id: FRONTEND_ID
+            }
+          }),
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    } catch(e) {}
+  });
 
   // Call endpoint /config to get valid and all urls for this project
   originalFetch("https://ai-analytics-7tka.onrender.com/config?public_api_key=" + encodeURIComponent(PUBLIC_API_KEY))
