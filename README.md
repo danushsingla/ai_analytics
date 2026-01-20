@@ -42,8 +42,9 @@ Something to note for the tracker script: If you want to run the script directly
 
 # To Do
 Fix latency recordings by putting the latency recorder inside of tracker.js rather than Supabase since Supabase include db time changes
-Hypothetically knowing when the chat window is open (bubble on the bottom right), I can do the following features:
-I can ensure they are on the same tab as the site and when they start typing start a timer until they finish (I check that by seeing if text data was sent to my backend). From there I can get typing time. I presume I can also get the location of their cursor during this time. I can also get user response times by how long after the ai responds they start typing again. I can get all of this by JUST tracking if the ai window is open. Am I correct?
+I can get user response times by how long after the ai responds they start typing again (After last chat message sent, how long does it take for the first new key to be hit)
+I can get typing time by seeing how long after the first key is hit they keep typing for until the message is sent
+I can check abandoned messages by seeing if they type but the window gets closed or the entire message gets deleted before it is sent
 
 ## Huge Security Violations
 Since we have an endpoint that is `/gtmtracker.js`, anybody can see our complete gtm tracker code. Could be a big deal down the road but we must forget this due to the ease of development.
